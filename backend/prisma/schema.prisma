@@ -1,0 +1,28 @@
+// Prisma Schema — Phase 2 (Grundsystem)
+// Tiefere Modelle folgen in Phase 4 (App-Datenmodell) und Phase 15 (Auth).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model App {
+  id        String   @id @default(cuid())
+  name      String
+  version   Int      @default(1)
+  schema    Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
