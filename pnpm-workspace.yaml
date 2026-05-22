@@ -1,6 +1,6 @@
 packages:
-  - "frontend"
-  - "backend"
-  - "runtime"
-  - "templates/*"
-  - "packages/*"
+  - 'frontend'
+  - 'backend'
+  - 'runtime'
+  - 'templates/*'
+  - 'packages/*'
