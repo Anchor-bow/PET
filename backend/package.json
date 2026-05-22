@@ -1,0 +1,17 @@
+{
+  "name": "@pet/backend",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo \"TODO: nest start --watch (Phase 2)\"",
+    "build": "echo \"TODO: nest build (Phase 2)\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pet/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
