@@ -1,23 +1,112 @@
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useAppStore } from '../store/useAppStore';
 
 export function EditorPage() {
   const { appId } = useParams();
+  const {
+    currentApp,
+    currentAppDraft,
+    isCurrentAppLoading,
+    currentAppError,
+    isDirty,
+    isSaving,
+    history,
+    future,
+    loadApp,
+    clearCurrentApp,
+    updateDraft,
+    saveCurrentApp,
+    undo,
+    redo,
+  } = useAppStore();
+
+  useEffect(() => {
+    if (appId) {
+      loadApp(appId);
+    } else {
+      clearCurrentApp();
+    }
+    return () => clearCurrentApp();
+  }, [appId, loadApp, clearCurrentApp]);
+
+  if (!appId) {
+    return (
+      <section className="editor">
+        <header className="page-header">
+          <h1>Editor</h1>
+          <p>Keine App ausgewählt. Wähle eine App im Dashboard.</p>
+        </header>
+        <div className="editor-canvas">Canvas-Platzhalter</div>
+      </section>
+    );
+  }
+
+  if (isCurrentAppLoading) {
+    return (
+      <section className="editor">
+        <header className="page-header">
+          <h1>Editor</h1>
+          <p>Lade App…</p>
+        </header>
+      </section>
+    );
+  }
+
+  if (currentAppError) {
+    return (
+      <section className="editor">
+        <header className="page-header">
+          <h1>Editor</h1>
+          <p className="error">{currentAppError}</p>
+        </header>
+      </section>
+    );
+  }
+
+  if (!currentApp || !currentAppDraft) {
+    return null;
+  }
+
+  const handleRename = (name: string) => {
+    updateDraft((draft) => ({ ...draft, name }));
+  };
 
   return (
     <section className="editor">
       <header className="page-header">
         <h1>Editor</h1>
         <p>
-          {appId ? (
-            <>
-              App: <code>{appId}</code>
-            </>
-          ) : (
-            'Keine App ausgewählt. Drag & Drop Engine folgt in Phase 8.'
-          )}
+          App: <code>{currentApp.id}</code> · v{currentApp.version}
+          {isDirty && <span className="dirty"> · ungespeichert</span>}
         </p>
+        <div className="editor-toolbar">
+          <label>
+            Name:{' '}
+            <input
+              type="text"
+              value={currentAppDraft.name}
+              onChange={(e) => handleRename(e.target.value)}
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => void saveCurrentApp()}
+            disabled={!isDirty || isSaving}
+          >
+            {isSaving ? 'Speichere…' : 'Speichern'}
+          </button>
+          <button type="button" onClick={undo} disabled={history.length === 0}>
+            Undo
+          </button>
+          <button type="button" onClick={redo} disabled={future.length === 0}>
+            Redo
+          </button>
+        </div>
       </header>
-      <div className="editor-canvas">Canvas-Platzhalter</div>
+      <div className="editor-canvas">
+        Canvas-Platzhalter — Drag & Drop folgt in Phase 8.
+      </div>
     </section>
   );
 }
