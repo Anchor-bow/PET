@@ -1,4 +1,4 @@
-import type { AppDefinition, StoredApp } from '@pet/types';
+import type { AppDefinition, ComponentNode, StoredApp } from '@pet/types';
 import { create } from 'zustand';
 import {
   type AppSummary,
@@ -33,6 +33,7 @@ interface AppState {
   createApp: (name: string) => Promise<StoredApp>;
   deleteApp: (id: string) => Promise<void>;
   updateDraft: (updater: (draft: AppDefinition) => AppDefinition) => void;
+  addComponentToCurrentPage: (node: ComponentNode) => void;
   saveCurrentApp: () => Promise<void>;
   undo: () => void;
   redo: () => void;
@@ -160,6 +161,18 @@ export const useAppStore = create<AppState>((set, get) => ({
       history: nextHistory,
       future: [],
       isDirty: true,
+    });
+  },
+
+  addComponentToCurrentPage: (node) => {
+    const { currentAppDraft, updateDraft } = get();
+    if (!currentAppDraft) return;
+    updateDraft((draft) => {
+      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      if (!page) return draft;
+      const root = page.root;
+      root.children = [...(root.children ?? []), node];
+      return draft;
     });
   },
 

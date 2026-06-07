@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { ComponentRenderer, componentRegistry, insertableComponentTypes } from '../components/builder';
+import { createComponentNode } from '../lib/createComponent';
 import { useAppStore } from '../store/useAppStore';
 
 export function EditorPage() {
@@ -16,6 +18,7 @@ export function EditorPage() {
     loadApp,
     clearCurrentApp,
     updateDraft,
+    addComponentToCurrentPage,
     saveCurrentApp,
     undo,
     redo,
@@ -37,7 +40,7 @@ export function EditorPage() {
           <h1>Editor</h1>
           <p>Keine App ausgewählt. Wähle eine App im Dashboard.</p>
         </header>
-        <div className="editor-canvas">Canvas-Platzhalter</div>
+        <div className="editor-canvas editor-canvas-empty">Canvas-Platzhalter</div>
       </section>
     );
   }
@@ -72,6 +75,10 @@ export function EditorPage() {
     updateDraft((draft) => ({ ...draft, name }));
   };
 
+  const currentPage =
+    currentAppDraft.pages.find((p) => p.id === currentAppDraft.defaultPageId) ??
+    currentAppDraft.pages[0];
+
   return (
     <section className="editor">
       <header className="page-header">
@@ -103,9 +110,25 @@ export function EditorPage() {
             Redo
           </button>
         </div>
+        <div className="editor-toolbar">
+          <span className="editor-toolbar-label">Hinzufügen:</span>
+          {insertableComponentTypes.map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => addComponentToCurrentPage(createComponentNode(type))}
+            >
+              + {componentRegistry[type].label}
+            </button>
+          ))}
+        </div>
       </header>
       <div className="editor-canvas">
-        Canvas-Platzhalter — Drag & Drop folgt in Phase 8.
+        {currentPage ? (
+          <ComponentRenderer node={currentPage.root} />
+        ) : (
+          <p className="empty">Keine Seite vorhanden.</p>
+        )}
       </div>
     </section>
   );

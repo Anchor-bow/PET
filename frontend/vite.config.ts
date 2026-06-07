@@ -1,5 +1,9 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
@@ -13,7 +17,12 @@ export default defineConfig({
       },
     },
   },
+  resolve: {
+    alias: {
+      '@pet/types': path.resolve(__dirname, '../packages/types/src/index.ts'),
+    },
+  },
   optimizeDeps: {
-    include: ['@pet/types'],
+    exclude: ['@pet/types'],
   },
 });

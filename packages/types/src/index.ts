@@ -55,6 +55,59 @@ export type StyleValue = z.infer<typeof styleValueSchema>;
 export type ComponentProps = Record<string, JsonValue>;
 export type ComponentStyles = Record<string, StyleValue>;
 
+export const buttonPropsSchema = z.object({
+  label: z.string().default('Button'),
+  variant: z.enum(['primary', 'secondary', 'danger']).default('primary'),
+  disabled: z.boolean().default(false),
+});
+export type ButtonProps = z.infer<typeof buttonPropsSchema>;
+
+export const inputPropsSchema = z.object({
+  label: z.string().default(''),
+  placeholder: z.string().default(''),
+  inputType: z.enum(['text', 'number', 'email', 'password']).default('text'),
+  value: z.string().default(''),
+  required: z.boolean().default(false),
+});
+export type InputProps = z.infer<typeof inputPropsSchema>;
+
+export const containerPropsSchema = z.object({
+  direction: z.enum(['row', 'column']).default('column'),
+  gap: z.number().int().min(0).default(8),
+  padding: z.number().int().min(0).default(0),
+});
+export type ContainerProps = z.infer<typeof containerPropsSchema>;
+
+export const textPropsSchema = z.object({
+  content: z.string().default('Text'),
+  variant: z.enum(['heading1', 'heading2', 'body', 'caption']).default('body'),
+});
+export type TextProps = z.infer<typeof textPropsSchema>;
+
+export const imagePropsSchema = z.object({
+  src: z.string().default(''),
+  alt: z.string().default(''),
+  width: z.union([z.number(), z.string()]).default('100%'),
+});
+export type ImageProps = z.infer<typeof imagePropsSchema>;
+
+export function getDefaultComponentProps(type: ComponentType): ComponentProps {
+  switch (type) {
+    case 'button':
+      return buttonPropsSchema.parse({}) as ComponentProps;
+    case 'input':
+      return inputPropsSchema.parse({}) as ComponentProps;
+    case 'container':
+      return containerPropsSchema.parse({}) as ComponentProps;
+    case 'text':
+      return textPropsSchema.parse({}) as ComponentProps;
+    case 'image':
+      return imagePropsSchema.parse({}) as ComponentProps;
+    case 'custom':
+      return {};
+  }
+}
+
 export interface ComponentAction {
   id: Id;
   trigger: ActionTrigger;

@@ -11,8 +11,10 @@ Monorepo für einen visuellen No-Code App Builder mit Drag & Drop Editor, dynami
 | 3     | Frontend Grundsystem             | ✅ erledigt       |
 | 4     | App Datenmodell (JSON Schema)    | ✅ erledigt       |
 | 5     | App CRUD (Backend)               | ✅ erledigt       |
-| 6     | Global State (Frontend)          | ⏳ nächster Schritt |
-| 7-26  | siehe Roadmap unten              | ⏳ offen          |
+| 6     | Global State (Frontend)          | ✅ erledigt       |
+| 7     | Komponenten-System (Frontend)    | ✅ erledigt       |
+| 8     | Drag & Drop Engine               | ⏳ nächster Schritt |
+| 9-26  | siehe Roadmap unten              | ⏳ offen          |
 
 ## Projektstruktur
 
@@ -139,27 +141,27 @@ Ziel: Apps speichern
 - Schema-Validierung über gemeinsames Zod-App-Datenmodell
 - Version wird bei Updates erhöht
 
-### 6 — Global State (Frontend)
+### 6 — Global State (Frontend) ✅
 
 Ziel: Zentrale Steuerung
 
-- Store-Struktur für App-Liste vorhanden
-- App-Liste laden
-- App speichern
-- Undo/Redo Stack
-- Sync mit Backend
-- Dirty State Tracking
+- Zustand Store mit App-Liste, aktueller App und Draft
+- App-Liste laden (`loadApps`), App laden/speichern/löschen
+- Undo/Redo Stack (`history` / `future`, Limit 50)
+- Sync mit Backend über `apiUpdateApp`
+- Dirty State Tracking (`isDirty`, `isSaving`)
 
-### 7 — Komponenten-System
+### 7 — Komponenten-System ✅
 
 Ziel: UI-Bausteine
 
-- Basis-Komponenten: Button, Input, Container
-- Props System
-- Rendering Layer
-- Component Registry
+- Basis-Komponenten: Container, Text, Button, Input, Image, Custom
+- Props System mit Zod-Schemas pro Typ (`buttonPropsSchema` etc.) und `getDefaultComponentProps`
+- Component Registry (`frontend/src/components/builder/registry.ts`)
+- Rendering Layer: rekursiver `ComponentRenderer` läuft durch `ComponentNode`-Baum
+- Editor-Canvas rendert die Default-Page aus dem Draft inklusive Toolbar zum Einfügen
 
-### 8 — Drag & Drop Engine
+### 8 — Drag & Drop Engine (nächster Schritt)
 
 Ziel: Visueller Builder
 
@@ -168,6 +170,7 @@ Ziel: Visueller Builder
 - Positionierung (Grid / Free)
 - Verschieben, Löschen
 - Hierarchie (Nested Components)
+- Ersetzt die temporäre "Hinzufügen"-Toolbar in der EditorPage
 
 ### 9 — Property Editor
 
