@@ -1,4 +1,4 @@
-import type { AppDefinition, ComponentNode, StoredApp } from '@pet/types';
+import type { AppDefinition, ComponentNode, JsonValue, StoredApp } from '@pet/types';
 import { create } from 'zustand';
 import {
   type AppSummary,
@@ -9,6 +9,7 @@ import {
   updateApp as apiUpdateApp,
 } from '../api/apps';
 import { createEmptyApp } from '../lib/createEmptyApp';
+import { findNode, insertNode, moveNode, removeNode, updateNodeProps } from '../lib/tree';
 
 const HISTORY_LIMIT = 50;
 
@@ -27,6 +28,9 @@ interface AppState {
   history: AppDefinition[];
   future: AppDefinition[];
 
+  // TODO Phase 10 (Multi-Page): bei Page-Wechsel auf null setzen.
+  selectedNodeId: string | null;
+
   loadApps: () => Promise<void>;
   loadApp: (id: string) => Promise<void>;
   clearCurrentApp: () => void;
@@ -34,9 +38,19 @@ interface AppState {
   deleteApp: (id: string) => Promise<void>;
   updateDraft: (updater: (draft: AppDefinition) => AppDefinition) => void;
   addComponentToCurrentPage: (node: ComponentNode) => void;
+  insertComponentAt: (parentId: string, index: number, node: ComponentNode) => void;
+  moveComponent: (nodeId: string, targetParentId: string, targetIndex: number) => void;
+  removeComponent: (nodeId: string) => void;
+  setSelectedNode: (id: string | null) => void;
+  updateComponentProps: (nodeId: string, patch: Record<string, JsonValue>) => void;
   saveCurrentApp: () => Promise<void>;
   undo: () => void;
   redo: () => void;
+}
+
+function selectionSurvives(draft: AppDefinition | null, id: string | null): boolean {
+  if (!draft || !id) return false;
+  return draft.pages.some((page) => findNode(page.root, id) !== null);
 }
 
 function toMessage(err: unknown, fallback: string): string {
@@ -67,6 +81,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   history: [],
   future: [],
 
+  selectedNodeId: null,
+
   loadApps: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -88,6 +104,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         future: [],
         isDirty: false,
         isCurrentAppLoading: false,
+        selectedNodeId: null,
       });
     } catch (err) {
       set({
@@ -98,6 +115,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         isDirty: false,
         currentAppError: toMessage(err, 'App konnte nicht geladen werden.'),
         isCurrentAppLoading: false,
+        selectedNodeId: null,
       });
     }
   },
@@ -112,6 +130,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       currentAppError: null,
       isCurrentAppLoading: false,
       isSaving: false,
+      selectedNodeId: null,
     });
   },
 
@@ -141,6 +160,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           history: [],
           future: [],
           isDirty: false,
+          selectedNodeId: null,
         };
       }
       return { apps };
@@ -172,6 +192,61 @@ export const useAppStore = create<AppState>((set, get) => ({
       if (!page) return draft;
       const root = page.root;
       root.children = [...(root.children ?? []), node];
+      return draft;
+    });
+  },
+
+  insertComponentAt: (parentId, index, node) => {
+    const { updateDraft } = get();
+    updateDraft((draft) => {
+      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      if (!page) return draft;
+      insertNode(page.root, parentId, index, node);
+      return draft;
+    });
+  },
+
+  moveComponent: (nodeId, targetParentId, targetIndex) => {
+    const { updateDraft } = get();
+    updateDraft((draft) => {
+      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      if (!page) return draft;
+      moveNode(page.root, nodeId, targetParentId, targetIndex);
+      return draft;
+    });
+  },
+
+  removeComponent: (nodeId) => {
+    const { updateDraft } = get();
+    updateDraft((draft) => {
+      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      if (!page) return draft;
+      if (page.root.id === nodeId) return draft;
+      removeNode(page.root, nodeId);
+      return draft;
+    });
+    const { currentAppDraft, selectedNodeId } = get();
+    if (selectedNodeId && !selectionSurvives(currentAppDraft, selectedNodeId)) {
+      set({ selectedNodeId: null });
+    }
+  },
+
+  setSelectedNode: (id) => {
+    if (id === null) {
+      set({ selectedNodeId: null });
+      return;
+    }
+    const { currentAppDraft } = get();
+    if (!selectionSurvives(currentAppDraft, id)) return;
+    set({ selectedNodeId: id });
+  },
+
+  updateComponentProps: (nodeId, patch) => {
+    const { updateDraft } = get();
+    updateDraft((draft) => {
+      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      if (!page) return draft;
+      updateNodeProps(page.root, nodeId, patch);
       return draft;
     });
   },
@@ -210,7 +285,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   undo: () => {
-    const { history, future, currentAppDraft, currentApp } = get();
+    const { history, future, currentAppDraft, currentApp, selectedNodeId } = get();
     if (history.length === 0 || !currentAppDraft) return;
 
     const previous = history[history.length - 1];
@@ -222,11 +297,12 @@ export const useAppStore = create<AppState>((set, get) => ({
       history: nextHistory,
       future: nextFuture,
       isDirty: !isEqual(previous, currentApp?.schema),
+      selectedNodeId: selectionSurvives(previous, selectedNodeId) ? selectedNodeId : null,
     });
   },
 
   redo: () => {
-    const { history, future, currentAppDraft, currentApp } = get();
+    const { history, future, currentAppDraft, currentApp, selectedNodeId } = get();
     if (future.length === 0 || !currentAppDraft) return;
 
     const next = future[future.length - 1];
@@ -238,6 +314,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       history: nextHistory,
       future: nextFuture,
       isDirty: !isEqual(next, currentApp?.schema),
+      selectedNodeId: selectionSurvives(next, selectedNodeId) ? selectedNodeId : null,
     });
   },
 }));

@@ -234,3 +234,270 @@ body,
   border-radius: 4px;
   color: var(--muted);
 }
+
+.editor-workspace {
+  display: grid;
+  grid-template-columns: 200px 1fr 280px;
+  gap: 16px;
+  align-items: start;
+}
+
+.palette {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+}
+
+.palette-title {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.palette-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.palette-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: left;
+  cursor: grab;
+}
+
+.palette-item:hover {
+  border-color: var(--accent);
+}
+
+.palette-item.is-dragging {
+  opacity: 0.4;
+}
+
+.builder-canvas-root {
+  min-height: 100%;
+}
+
+.builder-node {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.builder-node:hover {
+  border-color: rgba(76, 139, 245, 0.4);
+}
+
+.builder-node.is-dragging {
+  opacity: 0.4;
+}
+
+.builder-node.is-selected {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.builder-node .builder-button,
+.builder-node .builder-input,
+.builder-node img,
+.builder-node .builder-image-placeholder {
+  pointer-events: none;
+}
+
+.builder-node-handle {
+  position: absolute;
+  top: -10px;
+  left: 6px;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: grab;
+  z-index: 2;
+}
+
+.builder-node:hover > .builder-node-handle,
+.builder-node.is-dragging > .builder-node-handle {
+  display: inline-flex;
+}
+
+.builder-node-label {
+  user-select: none;
+}
+
+.builder-node-delete {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.builder-node-slot {
+  display: contents;
+}
+
+.drop-zone {
+  border-radius: 3px;
+  transition:
+    background 100ms,
+    height 100ms;
+}
+
+.drop-zone-between {
+  height: 6px;
+  margin: 2px 0;
+}
+
+.drop-zone-empty {
+  min-height: 32px;
+  border: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.drop-zone-empty::before {
+  content: 'Hier ablegen';
+}
+
+.drop-zone.is-over {
+  background: var(--accent);
+  height: 14px;
+}
+
+.drop-zone-empty.is-over {
+  background: rgba(76, 139, 245, 0.15);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.drag-overlay {
+  background: var(--accent);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.property-editor {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.property-editor--empty {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.property-editor__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.property-editor__title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.property-editor__subtitle {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.property-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.property-editor__field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.property-editor__label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.property-editor__input,
+.property-editor__select,
+.property-editor__textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  width: 100%;
+}
+
+.property-editor__textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+
+.property-editor__input.is-invalid,
+.property-editor__select.is-invalid,
+.property-editor__textarea.is-invalid {
+  border-color: var(--error);
+}
+
+.property-editor__error {
+  font-size: 11px;
+  color: var(--error);
+}
+
+.property-editor__hint {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.property-editor__checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}

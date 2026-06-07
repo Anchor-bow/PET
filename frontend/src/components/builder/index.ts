@@ -5,3 +5,5 @@ export {
   insertableComponentTypes,
   type ComponentDefinition,
 } from './registry';
+export { BuilderCanvas, BuilderDndContext, ComponentPalette } from './dnd';
+export { PropertyEditor } from './PropertyEditor';

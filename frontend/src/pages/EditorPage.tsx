@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { ComponentRenderer, componentRegistry, insertableComponentTypes } from '../components/builder';
-import { createComponentNode } from '../lib/createComponent';
+import {
+  BuilderCanvas,
+  BuilderDndContext,
+  ComponentPalette,
+  PropertyEditor,
+} from '../components/builder';
 import { useAppStore } from '../store/useAppStore';
 
 export function EditorPage() {
@@ -18,8 +22,8 @@ export function EditorPage() {
     loadApp,
     clearCurrentApp,
     updateDraft,
-    addComponentToCurrentPage,
     saveCurrentApp,
+    setSelectedNode,
     undo,
     redo,
   } = useAppStore();
@@ -110,26 +114,20 @@ export function EditorPage() {
             Redo
           </button>
         </div>
-        <div className="editor-toolbar">
-          <span className="editor-toolbar-label">Hinzufügen:</span>
-          {insertableComponentTypes.map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => addComponentToCurrentPage(createComponentNode(type))}
-            >
-              + {componentRegistry[type].label}
-            </button>
-          ))}
-        </div>
       </header>
-      <div className="editor-canvas">
-        {currentPage ? (
-          <ComponentRenderer node={currentPage.root} />
-        ) : (
-          <p className="empty">Keine Seite vorhanden.</p>
-        )}
-      </div>
+      <BuilderDndContext>
+        <div className="editor-workspace">
+          <ComponentPalette />
+          <div className="editor-canvas" onClick={() => setSelectedNode(null)}>
+            {currentPage ? (
+              <BuilderCanvas root={currentPage.root} />
+            ) : (
+              <p className="empty">Keine Seite vorhanden.</p>
+            )}
+          </div>
+          <PropertyEditor />
+        </div>
+      </BuilderDndContext>
     </section>
   );
 }
