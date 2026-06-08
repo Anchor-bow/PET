@@ -1,4 +1,4 @@
-import type { AppDefinition, ComponentNode, JsonValue, PageDefinition, StoredApp } from '@pet/types';
+import type { AppDefinition, ComponentAction, ComponentNode, JsonValue, PageDefinition, StoredApp } from '@pet/types';
 import { create } from 'zustand';
 import {
   type AppSummary,
@@ -9,7 +9,7 @@ import {
   updateApp as apiUpdateApp,
 } from '../api/apps';
 import { createEmptyApp } from '../lib/createEmptyApp';
-import { findNode, insertNode, moveNode, removeNode, updateNodeProps } from '../lib/tree';
+import { findNode, insertNode, moveNode, removeNode, updateNodeActions, updateNodeProps } from '../lib/tree';
 
 const HISTORY_LIMIT = 50;
 
@@ -43,6 +43,7 @@ interface AppState {
   removeComponent: (nodeId: string) => void;
   setSelectedNode: (id: string | null) => void;
   updateComponentProps: (nodeId: string, patch: Record<string, JsonValue>) => void;
+  updateComponentActions: (nodeId: string, actions: ComponentAction[]) => void;
   saveCurrentApp: () => Promise<void>;
   undo: () => void;
   redo: () => void;
@@ -276,6 +277,18 @@ export const useAppStore = create<AppState>((set, get) => ({
       const page = draft.pages.find((p) => p.id === pageId);
       if (!page) return draft;
       updateNodeProps(page.root, nodeId, patch);
+      return draft;
+    });
+  },
+
+  updateComponentActions: (nodeId, actions) => {
+    const { currentAppDraft, currentPageId, updateDraft } = get();
+    if (!currentAppDraft) return;
+    const pageId = currentPageId ?? currentAppDraft.defaultPageId;
+    updateDraft((draft) => {
+      const page = draft.pages.find((p) => p.id === pageId);
+      if (!page) return draft;
+      updateNodeActions(page.root, nodeId, actions);
       return draft;
     });
   },

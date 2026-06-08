@@ -1,4 +1,4 @@
-import type { ComponentNode, JsonValue } from '@pet/types';
+import type { ComponentAction, ComponentNode, JsonValue } from '@pet/types';
 import { getComponentDefinition } from '../components/builder/registry';
 
 export function findNode(root: ComponentNode, id: string): ComponentNode | null {
@@ -63,6 +63,17 @@ export function updateNodeProps(
   const node = findNode(root, id);
   if (!node) return false;
   node.props = { ...node.props, ...patch };
+  return true;
+}
+
+export function updateNodeActions(
+  root: ComponentNode,
+  id: string,
+  actions: ComponentAction[],
+): boolean {
+  const node = findNode(root, id);
+  if (!node) return false;
+  node.actions = actions;
   return true;
 }
 

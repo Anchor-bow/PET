@@ -16,7 +16,8 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 8     | Drag & Drop Engine               | ✅ erledigt         |
 | 9     | Property Editor                  | ✅ erledigt         |
 | 10    | Seitenverwaltung                 | ✅ erledigt         |
-| 11–26 | siehe Übersicht                  | ⏳ offen            |
+| 11    | Actions System                   | ✅ erledigt         |
+| 12–26 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -178,14 +179,19 @@ Ziel: Multi-Page Support.
 - Datenbankanpassung nicht nötig — Seiten leben weiterhin im `App.schema` JSONB
 - Alle Mutationen (Drag & Drop, Props) arbeiten auf der aktuell ausgewählten Seite
 
-### 11 — Actions System
+### 11 — Actions System ✅
 
 Ziel: Interaktivität.
 
 - Action-Typen: Navigation, API Call, State Update
-- Event Binding: `onClick`, `onLoad`
-- Action Executor Engine
-- Serialisierung im JSON
+- Event Binding: `onClick`, `onLoad` (ergänzt aus `packages/types` — `actionTriggerSchema`)
+- Action Executor Engine (asynchron, unterstützt API-Calls)
+- Serialisierung im JSON ( `ComponentNode.actions` bereits im Datenmodell)
+- `updateNodeActions` in `frontend/src/lib/tree.ts`
+- `updateComponentActions` in `useAppStore.ts`
+- `supportedTriggers` pro Komponente in der Registry
+- Event-Wiring in Primitives (`onClick` → Executor)
+- Action-Editor-UI (modaler Dialog oder erweiterte Sidebar)
 
 ### 12 — Backend DB Builder
 

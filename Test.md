@@ -270,12 +270,18 @@ curl -X DELETE http://localhost:3000/api/apps/<id>
 1. `onClick` mit `navigation` zu zweiter Seite konfigurieren
 2. Action-Typ `apiCall` mit gültigem Endpoint anlegen
 3. Action-Typ `stateUpdate` anlegen (z. B. Counter erhöhen)
-4. Preview / Runtime starten und Button drücken
+4. ✋ **Nicht testbar in Phase 11** — Preview / Runtime erfordert Phase 20 (Runtime Renderer) + Phase 21 (Preview Mode)
 5. Speichern, Reload
 
-**Erwartetes Ergebnis:**
+**Erwartetes Ergebnis (Schritte 1–3, 5):**
 
-- Aktionen werden im JSON serialisiert
+- Aktionen werden im Property Editor der ausgewählten Komponente angezeigt
+- Trigger (onClick/onChange) und Typ (navigate/apiCall/stateUpdate) sind konfigurierbar
+- Payload-Editoren pro Action-Typ funktionieren
+- Aktionen werden im JSON serialisiert und nach Reload wieder geladen
+
+**Erwartetes Ergebnis (Schritt 4 — mit Phase 20/21):**
+
 - Action Executor führt Aktion zur Laufzeit aus
 - `navigation` wechselt Seite, `apiCall` macht HTTP-Request, `stateUpdate` mutiert Runtime-State
 - Fehler in einer Action bricht Folge-Actions ab und wird geloggt

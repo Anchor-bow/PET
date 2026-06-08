@@ -17,6 +17,7 @@ function toStyle(styles: ComponentStyles | undefined): CSSProperties | undefined
 export interface PrimitiveProps {
   node: ComponentNode;
   children?: ReactNode;
+  onAction?: Record<string, () => void>;
 }
 
 export function ContainerPrimitive({ node, children }: PrimitiveProps) {
@@ -55,7 +56,7 @@ export function TextPrimitive({ node }: PrimitiveProps) {
   }
 }
 
-export function ButtonPrimitive({ node }: PrimitiveProps) {
+export function ButtonPrimitive({ node, onAction }: PrimitiveProps) {
   const props = buttonPropsSchema.parse(node.props);
   return (
     <button
@@ -63,13 +64,14 @@ export function ButtonPrimitive({ node }: PrimitiveProps) {
       className={`builder-button builder-button-${props.variant}`}
       disabled={props.disabled}
       style={toStyle(node.styles)}
+      onClick={onAction?.onClick}
     >
       {props.label}
     </button>
   );
 }
 
-export function InputPrimitive({ node }: PrimitiveProps) {
+export function InputPrimitive({ node, onAction }: PrimitiveProps) {
   const props = inputPropsSchema.parse(node.props);
   return (
     <label className="builder-input" style={toStyle(node.styles)}>
@@ -80,6 +82,7 @@ export function InputPrimitive({ node }: PrimitiveProps) {
         defaultValue={props.value}
         required={props.required}
         readOnly
+        onChange={onAction?.onChange}
       />
     </label>
   );

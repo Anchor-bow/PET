@@ -14,6 +14,7 @@ import {
   type FieldDef,
   type TypeFieldsConfig,
 } from './propertyFields';
+import { ActionEditor } from './ActionEditor';
 
 export function PropertyEditor() {
   const selectedNodeId = useAppStore((s) => s.selectedNodeId);
@@ -58,6 +59,7 @@ export function PropertyEditor() {
           />
         ))
       )}
+      <ActionEditor node={selected} />
     </aside>
   );
 }
