@@ -149,6 +149,8 @@ export interface PageDefinition {
   name: string;
   path: string;
   root: ComponentNode;
+  description?: string;
+  parentPageId?: Id;
 }
 
 export const pageDefinitionSchema: z.ZodType<PageDefinition> = z.object({
@@ -156,6 +158,8 @@ export const pageDefinitionSchema: z.ZodType<PageDefinition> = z.object({
   name: z.string().min(1),
   path: z.string().regex(/^\/[a-zA-Z0-9/_-]*$/),
   root: componentNodeSchema,
+  description: z.string().optional(),
+  parentPageId: idSchema.optional(),
 });
 
 export interface AppDefinition {

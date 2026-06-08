@@ -15,7 +15,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 7     | Komponenten-System (Frontend)    | ✅ erledigt         |
 | 8     | Drag & Drop Engine               | ✅ erledigt         |
 | 9     | Property Editor                  | ✅ erledigt         |
-| 10    | Seitenverwaltung                 | ⏳ nächster Schritt |
+| 10    | Seitenverwaltung                 | ✅ erledigt         |
 | 11–26 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
@@ -162,14 +162,21 @@ Ziel: Komponenten bearbeiten.
 - Editor-Workspace ist jetzt 3-spaltig (Palette + Canvas + Property Editor)
 - Canvas-Primitives sind nicht interaktiv (`pointer-events: none` auf Input/Button/Bild) — Klick selektiert immer die Komponente
 
-### 10 — Seitenverwaltung
+### 10 — Seitenverwaltung ✅
 
 Ziel: Multi-Page Support.
 
-- Seiten erstellen/löschen
-- Routing-Modell
-- Seitenwechsel im Builder
-- Default Page
+- `currentPageId` im Store — getrennt von `defaultPageId`, Seitenwechsel setzt Selection zurück
+- `addPage(name, parentPageId?)` — neue Seite mit Root-Container; optional mit Parent-Verknüpfung
+- `removePage(pageId)` — mit Schutz der letzten Seite + Bereinigung von Child-Referenzen
+- `updatePage(pageId, partial)` — einheitliches Update für Name, Pfad, Beschreibung, Parent
+- `setDefaultPage(pageId)` — Startseite umschalten
+- Page-Tabs im Editor-Header — aktive Seite hervorgehoben, ★ markiert Startseite
+- ✏️ Bearbeiten-Button → PageEditor-Panel (rechte Sidebar) mit Name, Beschreibung, Startseite, Parent-Seite, Pfad
+- 🗑 Löschen-Button → Confirm-Dialog "Willst du diese Seite wirklich löschen? Ja/Nein"
+- `PageDefinition` um `description?` und `parentPageId?` erweitert (Interface + Zod)
+- Datenbankanpassung nicht nötig — Seiten leben weiterhin im `App.schema` JSONB
+- Alle Mutationen (Drag & Drop, Props) arbeiten auf der aktuell ausgewählten Seite
 
 ### 11 — Actions System
 

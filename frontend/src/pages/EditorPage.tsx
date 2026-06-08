@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   BuilderCanvas,
@@ -6,6 +6,7 @@ import {
   ComponentPalette,
   PropertyEditor,
 } from '../components/builder';
+import { PageEditor } from '../components/builder/PageEditor';
 import { useAppStore } from '../store/useAppStore';
 
 export function EditorPage() {
@@ -13,6 +14,7 @@ export function EditorPage() {
   const {
     currentApp,
     currentAppDraft,
+    currentPageId,
     isCurrentAppLoading,
     currentAppError,
     isDirty,
@@ -26,7 +28,14 @@ export function EditorPage() {
     setSelectedNode,
     undo,
     redo,
+    setCurrentPage,
+    addPage,
+    removePage,
   } = useAppStore();
+
+  const [newPageName, setNewPageName] = useState('');
+  const [pageEditorPageId, setPageEditorPageId] = useState<string | null>(null);
+  const [confirmDeletePageId, setConfirmDeletePageId] = useState<string | null>(null);
 
   useEffect(() => {
     if (appId) {
@@ -36,6 +45,11 @@ export function EditorPage() {
     }
     return () => clearCurrentApp();
   }, [appId, loadApp, clearCurrentApp]);
+
+  useEffect(() => {
+    setPageEditorPageId(null);
+    setConfirmDeletePageId(null);
+  }, [currentPageId]);
 
   if (!appId) {
     return (
@@ -80,8 +94,26 @@ export function EditorPage() {
   };
 
   const currentPage =
+    currentAppDraft.pages.find((p) => p.id === currentPageId) ??
     currentAppDraft.pages.find((p) => p.id === currentAppDraft.defaultPageId) ??
     currentAppDraft.pages[0];
+
+  const handleAddPage = () => {
+    const name = newPageName.trim() || `Seite ${currentAppDraft.pages.length + 1}`;
+    addPage(name);
+    setNewPageName('');
+  };
+
+  const handleConfirmDelete = () => {
+    if (!confirmDeletePageId) return;
+    if (currentAppDraft.pages.length <= 1) return;
+    removePage(confirmDeletePageId);
+    setConfirmDeletePageId(null);
+  };
+
+  const editingPage = pageEditorPageId
+    ? currentAppDraft.pages.find((p) => p.id === pageEditorPageId) ?? null
+    : null;
 
   return (
     <section className="editor">
@@ -114,7 +146,89 @@ export function EditorPage() {
             Redo
           </button>
         </div>
+        <div className="page-tabs">
+          {currentAppDraft.pages.map((page) => (
+            <div
+              key={page.id}
+              className={`page-tab${page.id === currentPageId ? ' page-tab--active' : ''}`}
+            >
+              <button
+                type="button"
+                className="page-tab__btn"
+                onClick={() => setCurrentPage(page.id)}
+                title={`Zu "${page.name}" wechseln`}
+              >
+                {page.name}
+                {page.id === currentAppDraft.defaultPageId && (
+                  <span className="page-tab__default" title="Startseite">★</span>
+                )}
+              </button>
+              <button
+                type="button"
+                className="page-tab__edit"
+                onClick={() => setPageEditorPageId(page.id)}
+                title="Seite bearbeiten"
+              >
+                ✏️
+              </button>
+              <button
+                type="button"
+                className="page-tab__delete"
+                onClick={() => setConfirmDeletePageId(page.id)}
+                disabled={currentAppDraft.pages.length <= 1}
+                title="Seite löschen"
+              >
+                🗑
+              </button>
+            </div>
+          ))}
+          <div className="page-tab page-tab--add">
+            <input
+              type="text"
+              className="page-tab__input"
+              placeholder="Neue Seite"
+              value={newPageName}
+              onChange={(e) => setNewPageName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAddPage();
+              }}
+            />
+            <button
+              type="button"
+              className="page-tab__add-btn"
+              onClick={handleAddPage}
+              title="Seite hinzufügen"
+            >
+              +
+            </button>
+          </div>
+        </div>
       </header>
+
+      {confirmDeletePageId && (
+        <div className="confirm-overlay" onClick={() => setConfirmDeletePageId(null)}>
+          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <p>Willst du diese Seite wirklich löschen?</p>
+            <div className="confirm-dialog__actions">
+              <button
+                type="button"
+                className="confirm-dialog__btn confirm-dialog__btn--yes"
+                onClick={handleConfirmDelete}
+              >
+                Ja
+              </button>
+              <button
+                type="button"
+                className="confirm-dialog__btn confirm-dialog__btn--no"
+                onClick={() => setConfirmDeletePageId(null)}
+              >
+                Nein
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <BuilderDndContext>
         <div className="editor-workspace">
           <ComponentPalette />
@@ -125,7 +239,11 @@ export function EditorPage() {
               <p className="empty">Keine Seite vorhanden.</p>
             )}
           </div>
-          <PropertyEditor />
+          {editingPage ? (
+            <PageEditor page={editingPage} onClose={() => setPageEditorPageId(null)} />
+          ) : (
+            <PropertyEditor />
+          )}
         </div>
       </BuilderDndContext>
     </section>

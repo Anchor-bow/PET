@@ -1,4 +1,4 @@
-import type { AppDefinition, ComponentNode, JsonValue, StoredApp } from '@pet/types';
+import type { AppDefinition, ComponentNode, JsonValue, PageDefinition, StoredApp } from '@pet/types';
 import { create } from 'zustand';
 import {
   type AppSummary,
@@ -20,6 +20,7 @@ interface AppState {
 
   currentApp: StoredApp | null;
   currentAppDraft: AppDefinition | null;
+  currentPageId: string | null;
   isCurrentAppLoading: boolean;
   currentAppError: string | null;
   isDirty: boolean;
@@ -28,7 +29,6 @@ interface AppState {
   history: AppDefinition[];
   future: AppDefinition[];
 
-  // TODO Phase 10 (Multi-Page): bei Page-Wechsel auf null setzen.
   selectedNodeId: string | null;
 
   loadApps: () => Promise<void>;
@@ -46,11 +46,27 @@ interface AppState {
   saveCurrentApp: () => Promise<void>;
   undo: () => void;
   redo: () => void;
+  setCurrentPage: (pageId: string) => void;
+  addPage: (name: string, parentPageId?: string) => void;
+  removePage: (pageId: string) => void;
+  updatePage: (pageId: string, partial: Partial<Pick<PageDefinition, 'name' | 'path' | 'description' | 'parentPageId'>>) => void;
+  setDefaultPage: (pageId: string) => void;
 }
 
-function selectionSurvives(draft: AppDefinition | null, id: string | null): boolean {
+function currentPage(draft: AppDefinition | null, currentPageId: string | null): PageDefinition | null {
+  if (!draft) return null;
+  if (currentPageId) {
+    const page = draft.pages.find((p) => p.id === currentPageId);
+    if (page) return page;
+  }
+  return draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0] ?? null;
+}
+
+function selectionSurvives(draft: AppDefinition | null, id: string | null, pageId: string | null): boolean {
   if (!draft || !id) return false;
-  return draft.pages.some((page) => findNode(page.root, id) !== null);
+  const page = currentPage(draft, pageId);
+  if (!page) return false;
+  return findNode(page.root, id) !== null;
 }
 
 function toMessage(err: unknown, fallback: string): string {
@@ -73,6 +89,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   currentApp: null,
   currentAppDraft: null,
+  currentPageId: null,
   isCurrentAppLoading: false,
   currentAppError: null,
   isDirty: false,
@@ -100,6 +117,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({
         currentApp: app,
         currentAppDraft: clone(app.schema),
+        currentPageId: app.schema.defaultPageId,
         history: [],
         future: [],
         isDirty: false,
@@ -110,6 +128,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({
         currentApp: null,
         currentAppDraft: null,
+        currentPageId: null,
         history: [],
         future: [],
         isDirty: false,
@@ -124,6 +143,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({
       currentApp: null,
       currentAppDraft: null,
+      currentPageId: null,
       history: [],
       future: [],
       isDirty: false,
@@ -157,6 +177,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           apps,
           currentApp: null,
           currentAppDraft: null,
+          currentPageId: null,
           history: [],
           future: [],
           isDirty: false,
@@ -185,21 +206,23 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   addComponentToCurrentPage: (node) => {
-    const { currentAppDraft, updateDraft } = get();
+    const { currentAppDraft, currentPageId, updateDraft } = get();
     if (!currentAppDraft) return;
+    const pageId = currentPageId ?? currentAppDraft.defaultPageId;
     updateDraft((draft) => {
-      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      const page = draft.pages.find((p) => p.id === pageId);
       if (!page) return draft;
-      const root = page.root;
-      root.children = [...(root.children ?? []), node];
+      page.root.children = [...(page.root.children ?? []), node];
       return draft;
     });
   },
 
   insertComponentAt: (parentId, index, node) => {
-    const { updateDraft } = get();
+    const { currentAppDraft, currentPageId, updateDraft } = get();
+    if (!currentAppDraft) return;
+    const pageId = currentPageId ?? currentAppDraft.defaultPageId;
     updateDraft((draft) => {
-      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      const page = draft.pages.find((p) => p.id === pageId);
       if (!page) return draft;
       insertNode(page.root, parentId, index, node);
       return draft;
@@ -207,9 +230,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   moveComponent: (nodeId, targetParentId, targetIndex) => {
-    const { updateDraft } = get();
+    const { currentAppDraft, currentPageId, updateDraft } = get();
+    if (!currentAppDraft) return;
+    const pageId = currentPageId ?? currentAppDraft.defaultPageId;
     updateDraft((draft) => {
-      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      const page = draft.pages.find((p) => p.id === pageId);
       if (!page) return draft;
       moveNode(page.root, nodeId, targetParentId, targetIndex);
       return draft;
@@ -217,16 +242,18 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   removeComponent: (nodeId) => {
-    const { updateDraft } = get();
+    const { currentAppDraft, currentPageId, updateDraft } = get();
+    if (!currentAppDraft) return;
+    const pageId = currentPageId ?? currentAppDraft.defaultPageId;
     updateDraft((draft) => {
-      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      const page = draft.pages.find((p) => p.id === pageId);
       if (!page) return draft;
       if (page.root.id === nodeId) return draft;
       removeNode(page.root, nodeId);
       return draft;
     });
-    const { currentAppDraft, selectedNodeId } = get();
-    if (selectedNodeId && !selectionSurvives(currentAppDraft, selectedNodeId)) {
+    const { currentAppDraft: draft, selectedNodeId, currentPageId: cpId } = get();
+    if (selectedNodeId && !selectionSurvives(draft, selectedNodeId, cpId)) {
       set({ selectedNodeId: null });
     }
   },
@@ -236,15 +263,17 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ selectedNodeId: null });
       return;
     }
-    const { currentAppDraft } = get();
-    if (!selectionSurvives(currentAppDraft, id)) return;
+    const { currentAppDraft, currentPageId } = get();
+    if (!selectionSurvives(currentAppDraft, id, currentPageId)) return;
     set({ selectedNodeId: id });
   },
 
   updateComponentProps: (nodeId, patch) => {
-    const { updateDraft } = get();
+    const { currentAppDraft, currentPageId, updateDraft } = get();
+    if (!currentAppDraft) return;
+    const pageId = currentPageId ?? currentAppDraft.defaultPageId;
     updateDraft((draft) => {
-      const page = draft.pages.find((p) => p.id === draft.defaultPageId) ?? draft.pages[0];
+      const page = draft.pages.find((p) => p.id === pageId);
       if (!page) return draft;
       updateNodeProps(page.root, nodeId, patch);
       return draft;
@@ -285,7 +314,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   undo: () => {
-    const { history, future, currentAppDraft, currentApp, selectedNodeId } = get();
+    const { history, future, currentAppDraft, currentApp, selectedNodeId, currentPageId } = get();
     if (history.length === 0 || !currentAppDraft) return;
 
     const previous = history[history.length - 1];
@@ -297,12 +326,12 @@ export const useAppStore = create<AppState>((set, get) => ({
       history: nextHistory,
       future: nextFuture,
       isDirty: !isEqual(previous, currentApp?.schema),
-      selectedNodeId: selectionSurvives(previous, selectedNodeId) ? selectedNodeId : null,
+      selectedNodeId: selectionSurvives(previous, selectedNodeId, currentPageId) ? selectedNodeId : null,
     });
   },
 
   redo: () => {
-    const { history, future, currentAppDraft, currentApp, selectedNodeId } = get();
+    const { history, future, currentAppDraft, currentApp, selectedNodeId, currentPageId } = get();
     if (future.length === 0 || !currentAppDraft) return;
 
     const next = future[future.length - 1];
@@ -314,7 +343,80 @@ export const useAppStore = create<AppState>((set, get) => ({
       history: nextHistory,
       future: nextFuture,
       isDirty: !isEqual(next, currentApp?.schema),
-      selectedNodeId: selectionSurvives(next, selectedNodeId) ? selectedNodeId : null,
+      selectedNodeId: selectionSurvives(next, selectedNodeId, currentPageId) ? selectedNodeId : null,
+    });
+  },
+
+  setCurrentPage: (pageId) => {
+    const { currentAppDraft } = get();
+    if (!currentAppDraft) return;
+    if (!currentAppDraft.pages.some((p) => p.id === pageId)) return;
+    set({ currentPageId: pageId, selectedNodeId: null });
+  },
+
+  addPage: (name, parentPageId) => {
+    const { currentAppDraft, updateDraft } = get();
+    if (!currentAppDraft) return;
+    const newPageId = crypto.randomUUID();
+    updateDraft((draft) => {
+      const root: ComponentNode = {
+        id: crypto.randomUUID(),
+        type: 'container',
+        name: 'Root',
+        props: {},
+        children: [],
+      };
+      const path = `/${name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'seite'}`;
+      const page: PageDefinition = {
+        id: newPageId,
+        name: name.trim() || 'Neue Seite',
+        path: parentPageId
+          ? `${draft.pages.find((p) => p.id === parentPageId)?.path ?? ''}${path}`
+          : path,
+        root,
+        parentPageId,
+      };
+      return { ...draft, pages: [...draft.pages, page] };
+    });
+    set({ currentPageId: newPageId, selectedNodeId: null });
+  },
+
+  removePage: (pageId) => {
+    const { currentAppDraft, updateDraft } = get();
+    if (!currentAppDraft) return;
+    if (currentAppDraft.pages.length <= 1) return;
+    updateDraft((draft) => {
+      const remaining = draft.pages
+        .filter((p) => p.id !== pageId)
+        .map((p) =>
+          p.parentPageId === pageId ? { ...p, parentPageId: undefined } : p,
+        );
+      let { defaultPageId } = draft;
+      if (defaultPageId === pageId && remaining.length > 0) {
+        defaultPageId = remaining[0].id;
+      }
+      return { ...draft, pages: remaining, defaultPageId };
+    });
+    const { currentPageId, currentAppDraft: draft } = get();
+    if (currentPageId === pageId && draft) {
+      const fallback = draft.pages.find((p) => p.id !== pageId) ?? draft.pages[0];
+      if (fallback) set({ currentPageId: fallback.id, selectedNodeId: null });
+    }
+  },
+
+  updatePage: (pageId, partial) => {
+    const { updateDraft } = get();
+    updateDraft((draft) => ({
+      ...draft,
+      pages: draft.pages.map((p) => (p.id === pageId ? { ...p, ...partial } : p)),
+    }));
+  },
+
+  setDefaultPage: (pageId) => {
+    const { updateDraft } = get();
+    updateDraft((draft) => {
+      if (!draft.pages.some((p) => p.id === pageId)) return draft;
+      return { ...draft, defaultPageId: pageId };
     });
   },
 }));
