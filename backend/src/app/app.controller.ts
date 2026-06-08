@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
+import { ApiBody } from '@nestjs/swagger';
 import { AppDomainService } from './app.service';
 
 @Controller('apps')
@@ -16,11 +17,33 @@ export class AppDomainController {
   }
 
   @Post()
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['schema'],
+      properties: {
+        name: { type: 'string', example: 'Meine App' },
+        schema: {
+          type: 'object',
+          description: 'AppDefinition JSON',
+        },
+      },
+    },
+  })
   create(@Body() body: unknown) {
     return this.appService.create(body);
   }
 
   @Patch(':id')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Neuer Name' },
+        schema: { type: 'object', description: 'AppDefinition JSON' },
+      },
+    },
+  })
   update(@Param('id') id: string, @Body() body: unknown) {
     return this.appService.update(id, body);
   }

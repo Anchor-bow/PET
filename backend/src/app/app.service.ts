@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { randomBytes } from 'node:crypto';
 import { appDefinitionSchema, type AppDefinition } from '@pet/types';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -44,13 +45,25 @@ export class AppDomainService {
     const payload = this.parseCreateBody(body);
     const schema = this.parseAppSchema(payload.schema);
     const name = this.resolveName(payload.name, schema.name);
+    const id = this.generateId();
 
     return this.prisma.app.create({
       data: {
+        id,
         name,
         schema: this.toJsonInput(schema),
       },
     });
+  }
+
+  private generateId(): string {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const bytes = randomBytes(6);
+    let id = '';
+    for (let i = 0; i < 6; i++) {
+      id += chars[bytes[i] % chars.length];
+    }
+    return id;
   }
 
   async update(id: string, body: unknown) {

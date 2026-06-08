@@ -252,6 +252,54 @@ export const storedAppSchema: z.ZodType<StoredApp> = z.object({
   schema: appDefinitionSchema,
 });
 
+export function buildRecordSchema(fields: FieldDefinition[]): z.ZodObject<Record<string, z.ZodTypeAny>> {
+  const shape: Record<string, z.ZodTypeAny> = {};
+
+  for (const field of fields) {
+    let zodType: z.ZodTypeAny;
+
+    switch (field.type) {
+      case 'string':
+        zodType = z.string();
+        break;
+      case 'number':
+        zodType = z.number();
+        break;
+      case 'boolean':
+        zodType = z.boolean();
+        break;
+      case 'email':
+        zodType = z.string().email();
+        break;
+      case 'url':
+        zodType = z.string().url();
+        break;
+      case 'date':
+        zodType = z.string().datetime();
+        break;
+      case 'text':
+        zodType = z.string();
+        break;
+      case 'select':
+        zodType = z.string();
+        if (field.options && field.options.length > 0) {
+          zodType = z.enum(field.options as [string, ...string[]]);
+        }
+        break;
+    }
+
+    if (field.required) {
+      zodType = field.defaultValue !== undefined ? zodType.default(field.defaultValue) : zodType;
+    } else {
+      zodType = field.defaultValue !== undefined ? zodType.default(field.defaultValue).optional() : zodType.optional();
+    }
+
+    shape[field.key] = zodType;
+  }
+
+  return z.object(shape);
+}
+
 export function parseAppDefinition(value: unknown): AppDefinition {
   return appDefinitionSchema.parse(value);
 }

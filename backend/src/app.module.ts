@@ -4,6 +4,7 @@ import { HealthModule } from './health/health.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { AppDomainModule } from './app/app.module';
+import { CrudGeneratorModule } from './crud-generator/crud-generator.module';
 import { DbBuilderModule } from './db-builder/db-builder.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -16,6 +17,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     AppDomainModule,
     DbBuilderModule,
+    CrudGeneratorModule,
   ],
 })
 export class AppModule {}

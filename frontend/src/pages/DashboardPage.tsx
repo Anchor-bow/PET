@@ -53,13 +53,18 @@ export function DashboardPage() {
         {apps.length === 0 && !isLoading && <li className="empty">Noch keine Apps vorhanden.</li>}
         {apps.map((app) => (
           <li key={app.id} className="app-card">
-            <Link to={`/editor/${app.id}`}>
-              <strong>{app.name}</strong>
-            </Link>
-            <span>v{app.version}</span>
-            <button type="button" onClick={() => handleDelete(app.id, app.name)}>
-              Löschen
-            </button>
+            <div className="app-card-info">
+              <Link to={`/editor/${app.id}`}>
+                <strong>{app.name}</strong>
+              </Link>
+              <span className="app-card-id">{app.id.slice(0, 6)}</span>
+            </div>
+            <div className="app-card-actions">
+              <span className="app-card-version">v{app.version}</span>
+              <button type="button" onClick={() => handleDelete(app.id, app.name)}>
+                Löschen
+              </button>
+            </div>
           </li>
         ))}
       </ul>

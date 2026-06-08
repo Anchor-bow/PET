@@ -298,7 +298,7 @@ curl -X DELETE http://localhost:3000/api/apps/<id>
 
 ```bash
 # 1. App anlegen (falls keine existiert)
-APP_ID=$(curl -s -X POST http://localhost:3000/api/apps \
+ 
   -H "Content-Type: application/json" \
   -d '{"schema":{"schemaVersion":1,"name":"TestApp","defaultPageId":"p1","pages":[{"id":"p1","name":"Home","path":"/","root":{"id":"r1","type":"container","props":{},"children":[]}}]}}' | jq -r '.id')
 
