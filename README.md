@@ -21,6 +21,11 @@ PET/
 └── eslint.config.mjs
 ```
 
+## Architekturentscheidungen
+
+### Backend DB Builder — Meta-Tabellen (Phase 12)
+Der Backend DB Builder speichert benutzerdefinierte Tabellen und Felder nicht als native PostgreSQL-Tabellen, sondern in einem Meta-Tabellen-Ansatz (generische Record-Tabellen + JSONB). Dadurch bleibt das DB-Schema stabil — `pg_dump`/`pg_restore` funktionieren zu jedem Zeitpunkt ohne Schema-Konflikte.
+
 ## Toolchain
 
 - **Paketmanager:** pnpm 9 (Workspace)

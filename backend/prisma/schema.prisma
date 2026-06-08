@@ -25,4 +25,19 @@ model App {
   schema    Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  records Record[]
+}
+
+model Record {
+  id        String   @id @default(cuid())
+  appId     String
+  tableId   String
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId, tableId])
 }

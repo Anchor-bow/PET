@@ -162,11 +162,58 @@ export const pageDefinitionSchema: z.ZodType<PageDefinition> = z.object({
   parentPageId: idSchema.optional(),
 });
 
+export const fieldTypeSchema = z.enum([
+  'string',
+  'number',
+  'boolean',
+  'date',
+  'email',
+  'url',
+  'text',
+  'select',
+]);
+export type FieldType = z.infer<typeof fieldTypeSchema>;
+
+export interface FieldDefinition {
+  id: Id;
+  name: string;
+  key: string;
+  type: FieldType;
+  required: boolean;
+  defaultValue?: JsonValue;
+  options?: string[];
+}
+
+export const fieldDefinitionSchema: z.ZodType<FieldDefinition> = z.object({
+  id: idSchema,
+  name: z.string().min(1),
+  key: z.string().regex(/^[a-z][a-z0-9_]*$/),
+  type: fieldTypeSchema,
+  required: z.boolean().default(false),
+  defaultValue: jsonValueSchema.optional(),
+  options: z.array(z.string()).optional(),
+});
+
+export interface TableDefinition {
+  id: Id;
+  name: string;
+  slug: string;
+  fields: FieldDefinition[];
+}
+
+export const tableDefinitionSchema: z.ZodType<TableDefinition> = z.object({
+  id: idSchema,
+  name: z.string().min(1),
+  slug: z.string().regex(/^[a-z][a-z0-9_]*$/),
+  fields: z.array(fieldDefinitionSchema),
+});
+
 export interface AppDefinition {
   schemaVersion: typeof APP_SCHEMA_VERSION;
   name: string;
   defaultPageId: Id;
   pages: PageDefinition[];
+  tables?: TableDefinition[];
   theme?: Record<string, JsonValue>;
   metadata?: Record<string, JsonValue>;
 }
@@ -177,6 +224,7 @@ export const appDefinitionSchema: z.ZodType<AppDefinition> = z
     name: z.string().min(1),
     defaultPageId: idSchema,
     pages: z.array(pageDefinitionSchema).min(1),
+    tables: z.array(tableDefinitionSchema).optional(),
     theme: z.record(z.string(), jsonValueSchema).optional(),
     metadata: z.record(z.string(), jsonValueSchema).optional(),
   })

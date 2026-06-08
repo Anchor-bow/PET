@@ -290,21 +290,51 @@ curl -X DELETE http://localhost:3000/api/apps/<id>
 
 ## Phase 12 — Backend DB Builder
 
-**Voraussetzung:** Backend läuft.
+**Hinweis:** Phase 12 ist reines Backend. Die Frontend-UI (Table-Editor im Builder) folgt in Phase 27.
+
+**Voraussetzung:** Backend läuft, PostgreSQL läuft, Migrationen eingespielt.
 
 **Schritte:**
 
-1. Über API neue Tabelle definieren (z. B. `customers` mit Feldern `name: string`, `age: int`)
-2. Migration triggern
-3. Direkt in DB prüfen (`psql` oder `prisma studio`)
-4. Schema erneut über API abrufen
+```bash
+# 1. App anlegen (falls keine existiert)
+APP_ID=$(curl -s -X POST http://localhost:3000/api/apps \
+  -H "Content-Type: application/json" \
+  -d '{"schema":{"schemaVersion":1,"name":"TestApp","defaultPageId":"p1","pages":[{"id":"p1","name":"Home","path":"/","root":{"id":"r1","type":"container","props":{},"children":[]}}]}}' | jq -r '.id')
+
+# 2. Tabelle mit Feldern anlegen
+curl -s -X POST "http://localhost:3000/api/apps/$APP_ID/tables" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Customers","slug":"customers","fields":[{"name":"Vorname","key":"vorname","type":"string","required":true},{"name":"Alter","key":"alter","type":"number"}]}'
+
+# 3. Tabellen abrufen
+curl -s "http://localhost:3000/api/apps/$APP_ID/tables" | jq
+
+# 4. Einzeltabelle abrufen
+curl -s "http://localhost:3000/api/apps/$APP_ID/tables/TABLE_ID" | jq
+
+# 5. Tabelle updaten (z. B. Feld hinzufügen)
+curl -s -X PATCH "http://localhost:3000/api/apps/$APP_ID/tables/TABLE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{"fields":[{"name":"Vorname","key":"vorname","type":"string","required":true},{"name":"Alter","key":"alter","type":"number"},{"name":"Email","key":"email","type":"email","required":false}]}'
+
+# 6. Tabelle löschen
+curl -s -X DELETE "http://localhost:3000/api/apps/$APP_ID/tables/TABLE_ID"
+
+# 7. Prüfen ob App-Schema aktualisiert wurde
+curl -s "http://localhost:3000/api/apps/$APP_ID" | jq '.schema.tables'
+```
 
 **Erwartetes Ergebnis:**
 
-- Tabelle existiert physisch in Postgres
-- Feldtypen entsprechen Definition
-- Schema-Metadaten in Builder-Metatabelle gespeichert
-- Bestehende Daten bleiben bei Schema-Anpassung erhalten (oder Migration schlägt sauber fehl)
+- Schritt 2 → `201` + JSON mit `id`, `name`, `slug`, `fields`
+- Schritt 3 → Array mit der angelegten Tabelle
+- Schritt 4 → Objekt mit Feld-Definitionen
+- Schritt 5 → `200`, `fields` enthält jetzt 3 Einträge, `version` der App inkrementiert
+- Schritt 6 → `204`, danach Schritt 3 liefert leeres Array
+- Schritt 7 → Tabelle ist als Teil des App-Schemas persistiert
+- Doppelter `slug` → `409 Conflict`
+- Ungültige `slug` / `key` → `400` (regex `/^[a-z][a-z0-9_]*$/`)
 
 ---
 

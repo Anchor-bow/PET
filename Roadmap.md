@@ -17,7 +17,8 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 9     | Property Editor                  | ✅ erledigt         |
 | 10    | Seitenverwaltung                 | ✅ erledigt         |
 | 11    | Actions System                   | ✅ erledigt         |
-| 12–26 | siehe Übersicht                  | ⏳ offen            |
+| 12    | Backend DB Builder (Backend)     | ✅ erledigt         |
+| 13–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -49,6 +50,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 24  | Desktop Build (Electron)         | 4           | #22          |
 | 25  | Android Build (Capacitor)        | 5           | #22          |
 | 26  | Lizenzsystem                     | 3           | #2, #20      |
+| 27  | Erweiterung: Komponenten, Actions, DB UI & Backup | 4 | #11, #12, #20 |
 
 ## Kritische Blöcke
 
@@ -193,14 +195,15 @@ Ziel: Interaktivität.
 - Event-Wiring in Primitives (`onClick` → Executor)
 - Action-Editor-UI (modaler Dialog oder erweiterte Sidebar)
 
-### 12 — Backend DB Builder
+### 12 — Backend DB Builder ✅
 
-Ziel: Dynamische Datenbank.
+Ziel: Dynamische Datenbank (Backend, Ansatz A — Meta-Tabellen).
 
-- Tabellen erstellen
-- Felder definieren (Typen)
-- Migration Engine
-- Schema speichern
+- Tabellen/Felder-Definitionen im App-Schema (JSONB)
+- Record-Meta-Tabelle in Prisma (`appId`, `tableId`, `data`)
+- REST-API: `GET/POST/PATCH/DELETE /api/apps/:appId/tables`
+- Optimistische Concurrency über Schema-Version
+- **Frontend-UI folgt in Phase 27**
 
 ### 13 — CRUD API Generator
 
@@ -317,6 +320,15 @@ Ziel: Monetarisierung.
 - Backend-Speicherung
 - Runtime-Validierung
 - Ablaufdatum
+
+### 27 — Erweiterung: Komponenten, Actions, DB UI & Backup
+
+Ziel: Builder-Plattform erweitern + Datensicherheit.
+
+- **DB Builder UI**: Table-Liste, Table-Editor (Name + Slug), Field-Editor (Name/Typ/Required/Default) im Editor-Panel
+- **Erweiterte Komponenten**: neue UI-Bausteine (Liste, Tabelle, Card, Tabs, Form, Modal, Chart, Rich Text, Icon)
+- **Erweiterte Actions**: komplexe Workflows, Konditionale Actions, Timer/Verzögerung, Action-Chaining
+- **Backup & Restore**: Export/Import einzelner Apps als JSON-Dump, projektweites Backup inklusive aller benutzerdefinierten Daten (Meta-Tabellen), Wiederherstellungs-UI im Builder
 
 ---
 
