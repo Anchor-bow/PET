@@ -1,6 +1,9 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { useAuthStore } from '../store/useAuthStore';
 
 export function Layout() {
+  const logout = useAuthStore((s) => s.logout);
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -13,6 +16,10 @@ export function Layout() {
             Editor
           </NavLink>
         </nav>
+        <div className="sidebar-spacer" />
+        <button className="sidebar-logout" onClick={logout}>
+          Abmelden
+        </button>
       </aside>
       <main className="canvas">
         <Outlet />
