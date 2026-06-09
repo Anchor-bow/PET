@@ -4,6 +4,7 @@ import {
   BuilderCanvas,
   BuilderDndContext,
   ComponentPalette,
+  MediaLibrary,
   PropertyEditor,
 } from '../components/builder';
 import { PageEditor } from '../components/builder/PageEditor';
@@ -36,6 +37,7 @@ export function EditorPage() {
   const [newPageName, setNewPageName] = useState('');
   const [pageEditorPageId, setPageEditorPageId] = useState<string | null>(null);
   const [confirmDeletePageId, setConfirmDeletePageId] = useState<string | null>(null);
+  const [showMedia, setShowMedia] = useState(false);
 
   useEffect(() => {
     if (appId) {
@@ -145,6 +147,9 @@ export function EditorPage() {
           <button type="button" onClick={redo} disabled={future.length === 0}>
             Redo
           </button>
+          <button type="button" onClick={() => { setShowMedia((v) => !v); setPageEditorPageId(null); }}>
+            {showMedia ? 'Eigenschaften' : 'Mediathek'}
+          </button>
         </div>
         <div className="page-tabs">
           {currentAppDraft.pages.map((page) => (
@@ -241,6 +246,8 @@ export function EditorPage() {
           </div>
           {editingPage ? (
             <PageEditor page={editingPage} onClose={() => setPageEditorPageId(null)} />
+          ) : showMedia ? (
+            <MediaLibrary />
           ) : (
             <PropertyEditor />
           )}

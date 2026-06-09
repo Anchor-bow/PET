@@ -29,6 +29,7 @@ model App {
 
   records Record[]
   relationRecords RelationRecord[]
+  fileMetadata FileMetadata[]
 }
 
 model Record {
@@ -42,6 +43,20 @@ model Record {
   app App @relation(fields: [appId], references: [id], onDelete: Cascade)
 
   @@index([appId, tableId])
+}
+
+model FileMetadata {
+  id        String   @id @default(cuid())
+  appId     String
+  filename  String
+  mimetype  String
+  size      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId])
 }
 
 model RelationRecord {

@@ -20,7 +20,10 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 12    | Backend DB Builder (Backend)     | ✅ erledigt         |
 | 13    | CRUD API Generator               | ✅ erledigt         |
 | 14    | Relations System                 | ✅ erledigt         |
-| 15–27 | siehe Übersicht                  | ⏳ offen            |
+| 15    | Auth System                      | ✅ erledigt         |
+| 16    | Rollen & Berechtigungen          | ➖ übersprungen      |
+| 17    | File Upload System               | ✅ erledigt         |
+| 18–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -40,9 +43,9 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 12  | Backend DB Builder               | 5           | #4           |
 | 13  | CRUD API Generator               | 4           | #12          |
 | 14  | Relations System                 | 5           | #12          | ✅
-| 15  | Auth System                      | 2           | #2           |
-| 16  | Rollen & Berechtigungen          | 4           | #15          |
-| 17  | File Upload System               | 3           | #2           |
+| 15  | Auth System                      | 2           | #2           | ✅
+| 16    | Rollen & Berechtigungen          | 4           | #15          | ➖ übersprungen (Single-User)
+| 17  | File Upload System               | 3           | #2           | ✅
 | 18  | Email Integration                | 2           | #2           |
 | 19  | SMS Integration                  | 3           | #2           |
 | 20  | Runtime Renderer                 | 5           | #4, #7, #11  |
