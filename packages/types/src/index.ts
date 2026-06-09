@@ -171,8 +171,22 @@ export const fieldTypeSchema = z.enum([
   'url',
   'text',
   'select',
+  'relation',
 ]);
 export type FieldType = z.infer<typeof fieldTypeSchema>;
+
+export const relationTypeSchema = z.enum(['hasMany', 'belongsTo', 'manyToMany']);
+export type RelationType = z.infer<typeof relationTypeSchema>;
+
+export interface RelationDefinition {
+  type: RelationType;
+  targetTableId: Id;
+}
+
+export const relationDefinitionSchema: z.ZodType<RelationDefinition> = z.object({
+  type: relationTypeSchema,
+  targetTableId: idSchema,
+});
 
 export interface FieldDefinition {
   id: Id;
@@ -182,6 +196,7 @@ export interface FieldDefinition {
   required: boolean;
   defaultValue?: JsonValue;
   options?: string[];
+  relation?: RelationDefinition;
 }
 
 export const fieldDefinitionSchema: z.ZodType<FieldDefinition> = z.object({
@@ -192,6 +207,7 @@ export const fieldDefinitionSchema: z.ZodType<FieldDefinition> = z.object({
   required: z.boolean().default(false),
   defaultValue: jsonValueSchema.optional(),
   options: z.array(z.string()).optional(),
+  relation: relationDefinitionSchema.optional(),
 });
 
 export interface TableDefinition {
@@ -285,6 +301,9 @@ export function buildRecordSchema(fields: FieldDefinition[]): z.ZodObject<Record
         if (field.options && field.options.length > 0) {
           zodType = z.enum(field.options as [string, ...string[]]);
         }
+        break;
+      case 'relation':
+        zodType = z.union([z.string(), z.array(z.string())]);
         break;
     }
 

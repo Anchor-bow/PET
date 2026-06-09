@@ -18,7 +18,9 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 10    | Seitenverwaltung                 | ✅ erledigt         |
 | 11    | Actions System                   | ✅ erledigt         |
 | 12    | Backend DB Builder (Backend)     | ✅ erledigt         |
-| 13–27 | siehe Übersicht                  | ⏳ offen            |
+| 13    | CRUD API Generator               | ✅ erledigt         |
+| 14    | Relations System                 | ✅ erledigt         |
+| 15–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -37,7 +39,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 11  | Actions System                   | 5           | #6, #7       |
 | 12  | Backend DB Builder               | 5           | #4           |
 | 13  | CRUD API Generator               | 4           | #12          |
-| 14  | Relations System                 | 5           | #12          |
+| 14  | Relations System                 | 5           | #12          | ✅
 | 15  | Auth System                      | 2           | #2           |
 | 16  | Rollen & Berechtigungen          | 4           | #15          |
 | 17  | File Upload System               | 3           | #2           |
@@ -58,6 +60,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 - **#8** Drag & Drop — UX-Kern des Builders
 - **#11** Actions System — Interaktivität
 - **#12** Backend DB Builder — Datenebene
+- **#14** Relations System — Daten verknüpfen ✅
 - **#20** Runtime Renderer — App-Ausführung
 
 ---
@@ -205,21 +208,32 @@ Ziel: Dynamische Datenbank (Backend, Ansatz A — Meta-Tabellen).
 - Optimistische Concurrency über Schema-Version
 - **Frontend-UI folgt in Phase 27**
 
-### 13 — CRUD API Generator
+### 13 — CRUD API Generator ✅
 
-Ziel: Automatische APIs.
+Ziel: Automatische CRUD-APIs für benutzerdefinierte Tabellen.
 
-- Endpoints generieren: create, read, update, delete
-- Generic Controller
-- Validation
+- `buildRecordSchema(fields)` in `@pet/types` — dynamische Zod-Validierung aus `FieldDefinition[]` (unterstützt alle 8 Feldtypen: string, number, boolean, email, url, date, text, select)
+- Neues `CrudGeneratorModule` in `/backend/src/crud-generator/`
+- REST-API unter `/api/apps/:appId/records/:tableId[/:recordId]`
+  - `GET` — Records einer Tabelle listen (neueste zuerst)
+  - `GET :recordId` — Einzelnen Record abrufen
+  - `POST` — Record anlegen (mit Feldvalidierung, Unbekannte werden gefiltert)
+  - `PATCH :recordId` — Record aktualisieren (merged + validiert)
+  - `DELETE :recordId` — Record löschen (HTTP 204)
+- Absicherung: App existiert → Tabelle existiert → Tabelle hat Felder → Validation
+- `@ApiBody` Decorators für korrekte Swagger-Darstellung aller Body-Schemata
+- App-ID auf 6 Zeichen verkürzt (a-z, 0-9, via `crypto.randomBytes`)
+- Kurz-ID-Anzeige (erste 6 Stellen) im Frontend-Dashboard pro App-Karte
 
-### 14 — Relations System
+### 14 — Relations System ✅
 
 Ziel: Daten verknüpfen.
 
-- Foreign Keys
-- 1:n und n:m Beziehungen
-- Query Builder
+- **Types:** `RelationDefinition` (hasMany/belongsTo/manyToMany), `FieldType` um `'relation'` erweitert, `buildRecordSchema` unterstützt Relation-Felder
+- **Prisma:** Neues `RelationRecord`-Modell für n:m-Join-Tabelle, Migration erstellt
+- **DB Builder:** Relation-Felder in Table-Definitionen erlaubt, Zieltabellen-Validierung, Löschschutz bei referenzierenden Tabellen
+- **CRUD Generator:** FK-Validierung bei POST/PATCH, Cascade-Löschung bei 1:n (hasMany), n:m-Join-Bereinigung, optionales `?resolve=true` zum Auflösen von Relationen
+- **Query Builder:** Neuer Endpoint `POST /api/apps/:appId/query` mit `filter` (Unterstützt `$eq, $ne, $gt, $gte, $lt, $lte, $in, $contains`), `sort`, `include` (Relationen auflösen), `select` (Felder filtern)
 
 ### 15 — Auth System
 

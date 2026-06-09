@@ -12,12 +12,6 @@ import {
 } from '@pet/types';
 import { PrismaService } from '../prisma/prisma.service';
 
-interface CreateTableDto {
-  name: string;
-  slug: string;
-  fields?: CreateFieldDto[];
-}
-
 interface CreateFieldDto {
   name: string;
   key: string;
@@ -25,6 +19,13 @@ interface CreateFieldDto {
   required?: boolean;
   defaultValue?: unknown;
   options?: string[];
+  relation?: { type: string; targetTableId: string };
+}
+
+interface CreateTableDto {
+  name: string;
+  slug: string;
+  fields?: CreateFieldDto[];
 }
 
 interface UpdateTableDto {
@@ -67,6 +68,7 @@ export class DbBuilderService {
     }
 
     const fields: FieldDefinition[] = (dto.fields ?? []).map((f) => {
+      this.validateRelationField(f, tables);
       const field: FieldDefinition = {
         id: randomUUID(),
         name: f.name,
@@ -75,6 +77,7 @@ export class DbBuilderService {
         required: f.required ?? false,
         defaultValue: f.defaultValue as JsonValue | undefined,
         options: f.options,
+        relation: f.relation ? { type: f.relation.type as 'hasMany' | 'belongsTo' | 'manyToMany', targetTableId: f.relation.targetTableId } : undefined,
       };
       return fieldDefinitionSchema.parse(field);
     });
@@ -119,6 +122,7 @@ export class DbBuilderService {
 
     if (dto.fields !== undefined) {
       const fields: FieldDefinition[] = dto.fields.map((f) => {
+        this.validateRelationField(f, tables);
         const field: FieldDefinition = {
           id: randomUUID(),
           name: f.name,
@@ -127,6 +131,7 @@ export class DbBuilderService {
           required: f.required ?? false,
           defaultValue: f.defaultValue as JsonValue | undefined,
           options: f.options,
+          relation: f.relation ? { type: f.relation.type as 'hasMany' | 'belongsTo' | 'manyToMany', targetTableId: f.relation.targetTableId } : undefined,
         };
         return fieldDefinitionSchema.parse(field);
       });
@@ -150,8 +155,35 @@ export class DbBuilderService {
       throw new NotFoundException(`Table with id "${tableId}" was not found.`);
     }
 
+    const referencing = tables.filter((t) =>
+      t.fields.some((f) => f.type === 'relation' && f.relation?.targetTableId === tableId),
+    );
+
+    if (referencing.length > 0) {
+      throw new ConflictException(
+        `Cannot delete table "${tables[index].name}": tables [${referencing.map((t) => t.name).join(', ')}] have relation fields referencing it.`,
+      );
+    }
+
     schema.tables = tables.filter((t) => t.id !== tableId);
     await this.saveSchema(app.id, app.version, schema);
+  }
+
+  private validateRelationField(f: CreateFieldDto, tables: TableDefinition[]): void {
+    if (f.type === 'relation') {
+      if (!f.relation || !f.relation.targetTableId) {
+        throw new ConflictException(`Relation field "${f.name}" must specify a targetTableId.`);
+      }
+
+      const validTypes = ['hasMany', 'belongsTo', 'manyToMany'];
+      if (!validTypes.includes(f.relation.type)) {
+        throw new ConflictException(`Relation field "${f.name}" has invalid type "${f.relation.type}". Must be one of: ${validTypes.join(', ')}.`);
+      }
+
+      if (!tables.some((t) => t.id === f.relation!.targetTableId)) {
+        throw new ConflictException(`Relation field "${f.name}" targets table "${f.relation.targetTableId}" which does not exist.`);
+      }
+    }
   }
 
   private async getApp(appId: string) {

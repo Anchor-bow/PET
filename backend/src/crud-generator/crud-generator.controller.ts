@@ -1,5 +1,5 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
-import { ApiBody } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query } from '@nestjs/common';
+import { ApiBody, ApiQuery } from '@nestjs/swagger';
 import { CrudGeneratorService } from './crud-generator.service';
 
 @Controller('apps/:appId/records')
@@ -7,17 +7,24 @@ export class CrudGeneratorController {
   constructor(private readonly service: CrudGeneratorService) {}
 
   @Get(':tableId')
-  list(@Param('appId') appId: string, @Param('tableId') tableId: string) {
-    return this.service.listRecords(appId, tableId);
+  @ApiQuery({ name: 'resolve', required: false, type: Boolean, description: 'Auflösen von Relation-Feldern' })
+  list(
+    @Param('appId') appId: string,
+    @Param('tableId') tableId: string,
+    @Query('resolve') resolve?: string,
+  ) {
+    return this.service.listRecords(appId, tableId, resolve === 'true');
   }
 
   @Get(':tableId/:recordId')
+  @ApiQuery({ name: 'resolve', required: false, type: Boolean, description: 'Auflösen von Relation-Feldern' })
   get(
     @Param('appId') appId: string,
     @Param('tableId') tableId: string,
     @Param('recordId') recordId: string,
+    @Query('resolve') resolve?: string,
   ) {
-    return this.service.getRecord(appId, tableId, recordId);
+    return this.service.getRecord(appId, tableId, recordId, resolve === 'true');
   }
 
   @Post(':tableId')

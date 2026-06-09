@@ -27,6 +27,7 @@ model App {
   updatedAt DateTime @updatedAt
 
   records Record[]
+  relationRecords RelationRecord[]
 }
 
 model Record {
@@ -40,4 +41,19 @@ model Record {
   app App @relation(fields: [appId], references: [id], onDelete: Cascade)
 
   @@index([appId, tableId])
+}
+
+model RelationRecord {
+  id              String   @id @default(cuid())
+  appId           String
+  sourceTableId   String
+  sourceRecordId  String
+  targetTableId   String
+  targetRecordId  String
+  createdAt       DateTime @default(now())
+
+  app App @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId, sourceTableId, sourceRecordId])
+  @@index([appId, targetTableId, targetRecordId])
 }

@@ -31,7 +31,7 @@ export class DbBuilderController {
             properties: {
               name: { type: 'string', example: 'Name' },
               key: { type: 'string', example: 'name' },
-              type: { type: 'string', example: 'string', enum: ['string', 'number', 'boolean', 'email', 'url', 'date', 'text', 'select'] },
+              type: { type: 'string', example: 'string', enum: ['string', 'number', 'boolean', 'email', 'url', 'date', 'text', 'select', 'relation'] },
               required: { type: 'boolean', default: false },
               defaultValue: { type: 'string' },
               options: { type: 'array', items: { type: 'string' } },
@@ -60,7 +60,7 @@ export class DbBuilderController {
             properties: {
               name: { type: 'string' },
               key: { type: 'string' },
-              type: { type: 'string', enum: ['string', 'number', 'boolean', 'email', 'url', 'date', 'text', 'select'] },
+              type: { type: 'string', enum: ['string', 'number', 'boolean', 'email', 'url', 'date', 'text', 'select', 'relation'] },
               required: { type: 'boolean' },
               defaultValue: { type: 'string' },
               options: { type: 'array', items: { type: 'string' } },
