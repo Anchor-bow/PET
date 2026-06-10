@@ -30,7 +30,7 @@ export class ExportService {
     }
   }
 
-  private buildApp(safeId: string, template: string, schema: Record<string, unknown>): string {
+  private buildApp(safeId: string, template: string, schema: Record<string, unknown>, timeoutMs = 300_000): string {
     const workDir = resolve(TEMP_BASE, safeId);
     const outputDir = resolve(workDir, 'output');
     const inputPath = resolve(workDir, 'app.json');
@@ -42,7 +42,7 @@ export class ExportService {
     try {
       execSync(
         `node "${BUILD_CLI}" --input "${inputPath}" --output "${outputDir}" --template ${template}`,
-        { cwd: MONOREPO_ROOT, stdio: 'pipe', timeout: 300_000 },
+        { cwd: MONOREPO_ROOT, stdio: 'pipe', timeout: timeoutMs },
       );
     } catch {
       rmSync(workDir, { recursive: true, force: true });
@@ -106,6 +106,36 @@ export class ExportService {
     stream.on('error', () => rmSync(workDir, { recursive: true, force: true }));
 
     return { stream, filename: installer };
+  }
+
+  async exportAndroidApp(appId: string): Promise<{ stream: Readable; filename: string }> {
+    const app = await this.getAppOrThrow(appId);
+    this.ensureBuildCli();
+
+    const safeId = app.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const schema = app.schema as Record<string, unknown>;
+    const workDir = this.buildApp(safeId, 'android', schema, 600_000);
+    const outputDir = resolve(workDir, 'output');
+
+    if (!existsSync(outputDir)) {
+      rmSync(workDir, { recursive: true, force: true });
+      throw new BadRequestException('Build completed but no output was produced.');
+    }
+
+    const files = readdirSync(outputDir);
+    const apk = files.find((f) => f.endsWith('.apk'));
+
+    if (!apk) {
+      rmSync(workDir, { recursive: true, force: true });
+      throw new BadRequestException('No APK file found in build output.');
+    }
+
+    const apkPath = join(outputDir, apk);
+    const stream = createReadStream(apkPath);
+    stream.on('close', () => rmSync(workDir, { recursive: true, force: true }));
+    stream.on('error', () => rmSync(workDir, { recursive: true, force: true }));
+
+    return { stream, filename: apk };
   }
 
   private zipDirectory(sourceDir: string, outPath: string): Promise<void> {

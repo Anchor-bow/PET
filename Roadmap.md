@@ -30,7 +30,8 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 22    | Template Engine + Web Build      | ✅ erledigt         |
 | 23    | Web Build                        | ✅ in #22 integriert |
 | 24   | Desktop Build (Electron)         | ✅ erledigt         |
-| 25–27 | siehe Übersicht                  | ⏳ offen            |
+| 25   | Android Build (Capacitor)        | ✅ erledigt         |
+| 26–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -60,7 +61,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 22  | Template Engine                  | 4           | #4           |
 | 23  | Web Build                        | 2           | #22          |
 | 24  | Desktop Build (Electron)         | 4           | #22          | ✅ erledigt |
-| 25  | Android Build (Capacitor)        | 5           | #22          |
+| 25   | Android Build (Capacitor)        | 5           | #22          | ✅ erledigt |
 | 26  | Lizenzsystem                     | 3           | #2, #20      |
 | 27  | Erweiterung: UI, Komponenten, Actions, DB UI, Device Preview & Backup | 4 | #11, #12, #20, #21 |
 

@@ -36,4 +36,16 @@ export class ExportController {
 
     return new StreamableFile(stream);
   }
+
+  @Post('android')
+  async exportAndroid(@Param('appId') appId: string, @Res({ passthrough: true }) res: Response) {
+    const { stream, filename } = await this.exportService.exportAndroidApp(appId);
+
+    res.set({
+      'Content-Type': 'application/vnd.android.package-archive',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+    });
+
+    return new StreamableFile(stream);
+  }
 }

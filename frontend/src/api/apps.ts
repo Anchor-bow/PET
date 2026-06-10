@@ -60,3 +60,12 @@ export async function exportAppDesktop(id: string): Promise<Blob> {
   );
   return data;
 }
+
+export async function exportAppAndroid(id: string): Promise<Blob> {
+  const { data } = await apiClient.post<Blob>(
+    `/apps/${id}/export/android`,
+    {},
+    { responseType: 'blob' },
+  );
+  return data;
+}

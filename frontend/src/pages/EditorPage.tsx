@@ -10,7 +10,7 @@ import {
 } from '../components/builder';
 import { PageEditor } from '../components/builder/PageEditor';
 import { useAppStore } from '../store/useAppStore';
-import { exportAppWeb, exportAppDesktop } from '../api/apps';
+import { exportAppWeb, exportAppDesktop, exportAppAndroid } from '../api/apps';
 
 export function EditorPage() {
   const { appId } = useParams();
@@ -81,6 +81,27 @@ export function EditorPage() {
       alert('Desktop-Export fehlgeschlagen. Ist electron-builder installiert?');
     } finally {
       setIsExportingDesktop(false);
+    }
+  }, [appId]);
+
+  const [isExportingAndroid, setIsExportingAndroid] = useState(false);
+  const handleExportAndroid = useCallback(async () => {
+    if (!appId) return;
+    setIsExportingAndroid(true);
+    try {
+      const blob = await exportAppAndroid(appId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${appId}-app.apk`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('Android-Export fehlgeschlagen. Ist das Android SDK installiert?');
+    } finally {
+      setIsExportingAndroid(false);
     }
   }, [appId]);
 
@@ -234,6 +255,14 @@ export function EditorPage() {
             title="App als Desktop-App exportieren (.exe)"
           >
             {isExportingDesktop ? 'Exportiere…' : 'Desktop-Export'}
+          </button>
+          <button
+            type="button"
+            onClick={handleExportAndroid}
+            disabled={isExportingAndroid}
+            title="App als Android-App exportieren (.apk)"
+          >
+            {isExportingAndroid ? 'Exportiere…' : 'Android-Export'}
           </button>
         </div>
         <div className="page-tabs">
