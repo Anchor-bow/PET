@@ -27,7 +27,9 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 19    | SMS Integration                  | ➖ zurückgestellt    |
 | 20    | Runtime Renderer                 | ✅ erledigt         |
 | 21    | Preview Mode                     | ✅ erledigt         |
-| 22–27 | siehe Übersicht                  | ⏳ offen            |
+| 22    | Template Engine                  | 🚧 in Bearbeitung   |
+| 23    | Web Build (PoC)                  | ✅ PoC abgeschlossen |
+| 24–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -59,7 +61,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 24  | Desktop Build (Electron)         | 4           | #22          |
 | 25  | Android Build (Capacitor)        | 5           | #22          |
 | 26  | Lizenzsystem                     | 3           | #2, #20      |
-| 27  | Erweiterung: Komponenten, Actions, DB UI & Backup | 4 | #11, #12, #20 |
+| 27  | Erweiterung: UI, Komponenten, Actions, DB UI, Device Preview & Backup | 4 | #11, #12, #20, #21 |
 
 ## Kritische Blöcke
 
@@ -310,20 +312,22 @@ Ziel: App live im Builder testen, ohne sie zu bauen.
 - Navigations-Leiste: Page-Tabs bleiben sichtbar, Klick navigiert in der Runtime
 - Zurück zum Editor: Toggle schaltet zurück auf BuilderCanvas
 
-### 22 — Template Engine
+### 22 — Template Engine 🚧
 
 Ziel: App generieren.
 
-- Basis-App erstellen
-- Config Injection
-- Build Scripts vorbereiten
+- Basis-App erstellen → `templates/web/` als Vite + React + `@pet/runtime` Template
+- Config Injection → Build-Skript schreibt App-Definition in `src/app.data.json`, wird zur Build-Zeit eingebunden
+- Build Scripts vorbereiten → `build.js` mit `--input <app.json> --output <dir>`
+- **Architektur:** Standalone-Build (gebündelt, ~225 kB / 68 kB gzip), `@pet/types` wird via Vite-Alias auf TS-Quelle aufgelöst (CJS/ESM-Kompatibilität)
 
-### 23 — Web Build
+### 23 — Web Build ✅ (PoC)
 
-Ziel: Web App.
+Ziel: Web App validieren.
 
-- Vite Build
-- Deployment-Struktur
+- Vite Build → funktioniert, produziert `index.html` + `assets/` mit relativem Base-Pfad
+- Deployment-Struktur → `dist/`-Ordner pro App, bereit zum Hochladen auf beliebigen Static-Host
+- Frontend-Integration („Exportieren"-Button) folgt in Phase 27 oder als separater Schritt
 
 ### 24 — Desktop Build
 
@@ -350,13 +354,16 @@ Ziel: Monetarisierung.
 - Runtime-Validierung
 - Ablaufdatum
 
-### 27 — Erweiterung: Komponenten, Actions, DB UI & Backup
+### 27 — Erweiterung: UI, Komponenten, Actions, DB UI, Device Preview & Backup
 
 Ziel: Builder-Plattform erweitern + Datensicherheit.
 
+- **UI Aufbau**: Editor-Layout überarbeiten (Toolbar-Anordnung, Panel-Größen, responsives Verhalten, Dark Mode)
+- **Seiten ID vereinfachen**: Im Action-Editor (Navigation-Action) statt roher UUID-Eingabe ein Dropdown mit allen verfügbaren Seiten anzeigen. Auch an anderen Stellen, wo aktuell IDs manuell eingegeben werden müssen
 - **DB Builder UI**: Table-Liste, Table-Editor (Name + Slug), Field-Editor (Name/Typ/Required/Default) im Editor-Panel
 - **Erweiterte Komponenten**: neue UI-Bausteine (Liste, Tabelle, Card, Tabs, Form, Modal, Chart, Rich Text, Icon)
 - **Erweiterte Actions**: komplexe Workflows, Konditionale Actions, Timer/Verzögerung, Action-Chaining
+- **Device Preview**: Desktop/Tablet/Android-Viewport-Umschalter in der Preview-Leiste, damit die App in verschiedenen Zielformaten getestet werden kann
 - **Backup & Restore**: Export/Import einzelner Apps als JSON-Dump, projektweites Backup inklusive aller benutzerdefinierten Daten (Meta-Tabellen), Wiederherstellungs-UI im Builder
 
 ---
@@ -365,6 +372,7 @@ Ziel: Builder-Plattform erweitern + Datensicherheit.
 
 - **#16 Rollen & Berechtigungen** — übersprungen (Single-User, kein Bedarf)
 - **#19 SMS Integration** — zurückgestellt (isoliertes Feature, kein Block für Runtime/Export)
+- **#22/#23 PoC-First** — Web Build (#23) wurde als Proof-of-Concept vor der fertigen Template Engine (#22) umgesetzt, um den Export-Pfad zu validieren. Die Template Engine wird basierend auf den Erkenntnissen des PoC verallgemeinert.
 
 ## Reihenfolge
 

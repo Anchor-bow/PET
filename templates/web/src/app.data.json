@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "name": "My App",
+  "defaultPageId": "page-1",
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Home",
+      "path": "/home",
+      "root": {
+        "id": "root-1",
+        "type": "container",
+        "props": {
+          "direction": "column",
+          "gap": 16,
+          "padding": 24
+        },
+        "children": [
+          {
+            "id": "text-1",
+            "type": "text",
+            "props": {
+              "content": "Welcome to PET!",
+              "variant": "heading1"
+            }
+          },
+          {
+            "id": "text-2",
+            "type": "text",
+            "props": {
+              "content": "This app was built with the No-Code App Builder.",
+              "variant": "body"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
