@@ -24,7 +24,9 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 16    | Rollen & Berechtigungen          | ➖ übersprungen      |
 | 17    | File Upload System               | ✅ erledigt         |
 | 18    | Email Integration                | ✅ erledigt         |
-| 19–27 | siehe Übersicht                  | ⏳ offen            |
+| 19    | SMS Integration                  | ➖ zurückgestellt    |
+| 20    | Runtime Renderer                 | ✅ erledigt         |
+| 21–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -48,8 +50,8 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 16    | Rollen & Berechtigungen          | 4           | #15          | ➖ übersprungen (Single-User)
 | 17  | File Upload System               | 3           | #2           | ✅
 | 18  | Email Integration                | 2           | #2           | ✅
-| 19  | SMS Integration                  | 3           | #2           |
-| 20  | Runtime Renderer                 | 5           | #4, #7, #11  |
+| 19  | SMS Integration                  | 3           | #2           | ➖ zurückgestellt
+| 20  | Runtime Renderer                 | 5           | #4, #7, #11  | ✅
 | 21  | Preview Mode                     | 4           | #20          |
 | 22  | Template Engine                  | 4           | #4           |
 | 23  | Web Build                        | 2           | #22          |
@@ -62,10 +64,10 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 
 - **#4** App Datenmodell — Fundament für alles weitere
 - **#8** Drag & Drop — UX-Kern des Builders
-- **#11** Actions System — Interaktivität
-- **#12** Backend DB Builder — Datenebene
+- **#11** Actions System — Interaktivität ✅
+- **#12** Backend DB Builder — Datenebene ✅
 - **#14** Relations System — Daten verknüpfen ✅
-- **#20** Runtime Renderer — App-Ausführung
+- **#20** Runtime Renderer — App-Ausführung ✅
 
 ---
 
@@ -282,22 +284,29 @@ Ziel: SMS Versand.
 - API Wrapper
 - Integration in Actions
 
-### 20 — Runtime Renderer (KRITISCH)
+### 20 — Runtime Renderer (KRITISCH) ✅
 
-Ziel: App ausführen.
+Ziel: App ausführen. Als React-Bibliothek (`@pet/runtime`) umgesetzt — kann sowohl in Preview (#21) als auch in Build-Targets (#23–25) importiert werden.
 
-- JSON → React Renderer
-- Component Mapping
-- State Handling
-- Action Execution
+- `RuntimeRenderer` — Top-Level-Komponente: `<RuntimeRenderer app={appDef} />`
+- `RuntimeProvider` — React Context mit State, Navigation und Action-Execution
+- `RuntimePageRenderer` + `RuntimeComponentRenderer` — rekursiver Tree-Renderer für Seiten/Component-Trees
+- `RuntimeState` — app-weiter Zustand (Input-Werte, API-Ergebnisse, etc.)
+- Action-Execution: Navigate, API Call, State Update, Submit, Custom
+- Interactive Primitives (Input editierbar, Button klickbar, keine Builder-Overlays)
+- Registry: ComponentType → Primitive (identische Struktur zum Builder)
+- **Architekturentscheidung:** Als Bibliothek, nicht als Framework — ermöglicht direkte Integration in Preview und Builds ohne doppelte React-Bäume
 
 ### 21 — Preview Mode
 
-Ziel: Testen im Builder.
+Ziel: App live im Builder testen, ohne sie zu bauen.
 
-- Runtime im iframe oder isoliert
-- Testdaten laden
-- Live Simulation
+- Preview-Toggle in der Editor-Toolbar („Vorschau“)
+- Inline-Preview: Ersetzt Canvas + Palette + PropertyEditor durch RuntimeRenderer
+- Live-Sync: RuntimeRenderer bekommt currentAppDraft — Änderungen im Editor erscheinen sofort
+- Testdaten für Tabellen (optional, zur Laufzeit über Actions)
+- Navigations-Leiste: Page-Tabs bleiben sichtbar, Klick navigiert in der Runtime
+- Zurück zum Editor: Toggle schaltet zurück auf BuilderCanvas
 
 ### 22 — Template Engine
 
@@ -349,6 +358,11 @@ Ziel: Builder-Plattform erweitern + Datensicherheit.
 - **Backup & Restore**: Export/Import einzelner Apps als JSON-Dump, projektweites Backup inklusive aller benutzerdefinierten Daten (Meta-Tabellen), Wiederherstellungs-UI im Builder
 
 ---
+
+## Abweichungen vom Plan
+
+- **#16 Rollen & Berechtigungen** — übersprungen (Single-User, kein Bedarf)
+- **#19 SMS Integration** — zurückgestellt (isoliertes Feature, kein Block für Runtime/Export)
 
 ## Reihenfolge
 

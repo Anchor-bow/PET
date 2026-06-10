@@ -26,6 +26,13 @@ PET/
 ### Backend DB Builder — Meta-Tabellen (Phase 12)
 Der Backend DB Builder speichert benutzerdefinierte Tabellen und Felder nicht als native PostgreSQL-Tabellen, sondern in einem Meta-Tabellen-Ansatz (generische Record-Tabellen + JSONB). Dadurch bleibt das DB-Schema stabil — `pg_dump`/`pg_restore` funktionieren zu jedem Zeitpunkt ohne Schema-Konflikte.
 
+### Runtime Renderer — Bibliothek statt Framework (Phase 20)
+Der Runtime Renderer (`@pet/runtime`) ist als importierbare React-Bibliothek umgesetzt, nicht als eigenständiges App-Framework. Gründe:
+- **Direkte Integration in Preview (#21):** Die Runtime kann ohne iframe oder doppelten React-Baum in der EditorPage gerendert werden
+- **Wiederverwendung in Builds (#23–25):** Web/Desktop/Mobile-Builds importieren dieselbe Bibliothek
+- **Kein Scope-Risiko:** Der Fokus liegt auf JSON→React-Rendering; Routing, Auth und Theme sind Sache der einbettenden Umgebung
+- **Ausbaufähig:** Bei Bedarf kann die Bibliothek später um Framework-Features erweitert werden
+
 ## Toolchain
 
 - **Paketmanager:** pnpm 9 (Workspace)
@@ -33,6 +40,7 @@ Der Backend DB Builder speichert benutzerdefinierte Tabellen und Felder nicht al
 - **Sprache:** TypeScript 5.7 (strict)
 - **Backend:** NestJS 10 + Prisma 5 + PostgreSQL
 - **Frontend:** React 18 + Vite 5 + Zustand 5 + React Router 6
+- **Runtime:** React 18 (eigenes Workspace `@pet/runtime`)
 - **Linting:** ESLint 9 (flat config) + Prettier 3
 
 ## Ports
@@ -128,6 +136,13 @@ pnpm clean            # dist + node_modules entfernen
 pnpm --filter @pet/backend run prisma:generate   # Prisma Client generieren
 pnpm --filter @pet/backend run prisma:migrate    # Migration anwenden (dev)
 pnpm --filter @pet/backend run build             # Production Build
+```
+
+## Runtime-Scripts
+
+```bash
+pnpm --filter @pet/runtime run build      # TypeScript kompilieren
+pnpm --filter @pet/runtime run typecheck  # Typen prüfen
 ```
 
 ## Frontend-Scripts

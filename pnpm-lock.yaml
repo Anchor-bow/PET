@@ -194,7 +194,13 @@ importers:
       '@pet/types':
         specifier: workspace:*
         version: link:../packages/types
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
     devDependencies:
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.29
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
