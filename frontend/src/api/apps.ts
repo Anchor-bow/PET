@@ -42,3 +42,12 @@ export async function updateApp(id: string, payload: UpdateAppPayload): Promise<
 export async function deleteApp(id: string): Promise<void> {
   await apiClient.delete(`/apps/${id}`);
 }
+
+export async function exportAppWeb(id: string): Promise<Blob> {
+  const { data } = await apiClient.post<Blob>(
+    `/apps/${id}/export`,
+    {},
+    { responseType: 'blob' },
+  );
+  return data;
+}

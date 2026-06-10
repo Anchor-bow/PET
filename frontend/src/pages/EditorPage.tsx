@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { RuntimeRenderer } from '@pet/runtime';
 import {
@@ -10,6 +10,7 @@ import {
 } from '../components/builder';
 import { PageEditor } from '../components/builder/PageEditor';
 import { useAppStore } from '../store/useAppStore';
+import { exportAppWeb } from '../api/apps';
 
 export function EditorPage() {
   const { appId } = useParams();
@@ -41,6 +42,7 @@ export function EditorPage() {
   const [pageEditorPageId, setPageEditorPageId] = useState<string | null>(null);
   const [confirmDeletePageId, setConfirmDeletePageId] = useState<string | null>(null);
   const [showMedia, setShowMedia] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     if (appId) {
@@ -116,6 +118,26 @@ export function EditorPage() {
     setConfirmDeletePageId(null);
   };
 
+  const handleExport = useCallback(async () => {
+    if (!appId) return;
+    setIsExporting(true);
+    try {
+      const blob = await exportAppWeb(appId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${appId}-web.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('Export fehlgeschlagen.');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [appId]);
+
   const editingPage = pageEditorPageId
     ? currentAppDraft.pages.find((p) => p.id === pageEditorPageId) ?? null
     : null;
@@ -177,6 +199,14 @@ export function EditorPage() {
               In neuem Tab öffnen
             </a>
           )}
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={isExporting}
+            title="App als Web-App exportieren"
+          >
+            {isExporting ? 'Exportiere…' : 'Exportieren'}
+          </button>
         </div>
         <div className="page-tabs">
           {currentAppDraft.pages.map((page) => {

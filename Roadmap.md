@@ -27,8 +27,8 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 19    | SMS Integration                  | ➖ zurückgestellt    |
 | 20    | Runtime Renderer                 | ✅ erledigt         |
 | 21    | Preview Mode                     | ✅ erledigt         |
-| 22    | Template Engine                  | 🚧 in Bearbeitung   |
-| 23    | Web Build (PoC)                  | ✅ PoC abgeschlossen |
+| 22    | Template Engine + Web Build      | ✅ erledigt         |
+| 23    | Web Build                        | ✅ in #22 integriert |
 | 24–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
@@ -312,22 +312,28 @@ Ziel: App live im Builder testen, ohne sie zu bauen.
 - Navigations-Leiste: Page-Tabs bleiben sichtbar, Klick navigiert in der Runtime
 - Zurück zum Editor: Toggle schaltet zurück auf BuilderCanvas
 
-### 22 — Template Engine 🚧
+### 22 — Template Engine + Web Build ✅
 
-Ziel: App generieren.
+Ziel: App generieren und als Standalone-Web-App exportieren.
 
-- Basis-App erstellen → `templates/web/` als Vite + React + `@pet/runtime` Template
-- Config Injection → Build-Skript schreibt App-Definition in `src/app.data.json`, wird zur Build-Zeit eingebunden
-- Build Scripts vorbereiten → `build.js` mit `--input <app.json> --output <dir>`
-- **Architektur:** Standalone-Build (gebündelt, ~225 kB / 68 kB gzip), `@pet/types` wird via Vite-Alias auf TS-Quelle aufgelöst (CJS/ESM-Kompatibilität)
-
-### 23 — Web Build ✅ (PoC)
-
-Ziel: Web App validieren.
-
-- Vite Build → funktioniert, produziert `index.html` + `assets/` mit relativem Base-Pfad
-- Deployment-Struktur → `dist/`-Ordner pro App, bereit zum Hochladen auf beliebigen Static-Host
-- Frontend-Integration („Exportieren"-Button) folgt in Phase 27 oder als separater Schritt
+- **Build-CLI** (`packages/build-cli/`) — `pet-build --template web --input <app.json> --output <dist>`
+  - Validiert die App-Definition mit `appDefinitionSchema` aus `@pet/types`
+  - Injiziert das App-JSON in das Template (`src/app.data.json`)
+  - Führt `vite build` im Template-Verzeichnis aus
+  - Output: fertiges `dist/` (index.html + assets/)
+- **Web Template** (`templates/web/`) — Vite + React + `@pet/runtime`
+  - Standalone-Build, alles gebündelt (~225 kB / 68 kB gzip)
+  - `@pet/types` via Vite-Alias auf TS-Quelle (CJS/ESM-Kompatibilität)
+- **Backend Export API** (`POST /api/apps/:appId/export`)
+  - Holt die App aus der DB, schreibt sie als Temp-JSON
+  - Spawnt die Build-CLI als Child-Prozess
+  - Verpackt das Build-Output als ZIP (`archiver`)
+  - Streamt die ZIP als Download (`StreamableFile`)
+- **Frontend Integration**
+  - "Exportieren"-Button in der Editor-Toolbar
+  - Ruft die Export-API auf, lädt die ZIP herunter
+  - Loading-/Error-State für User-Feedback
+- **Architektur:** Build läuft serverseitig (Backend spawnt CLI) — Frontend muss nur downloaden
 
 ### 24 — Desktop Build
 
@@ -372,7 +378,7 @@ Ziel: Builder-Plattform erweitern + Datensicherheit.
 
 - **#16 Rollen & Berechtigungen** — übersprungen (Single-User, kein Bedarf)
 - **#19 SMS Integration** — zurückgestellt (isoliertes Feature, kein Block für Runtime/Export)
-- **#22/#23 PoC-First** — Web Build (#23) wurde als Proof-of-Concept vor der fertigen Template Engine (#22) umgesetzt, um den Export-Pfad zu validieren. Die Template Engine wird basierend auf den Erkenntnissen des PoC verallgemeinert.
+- **#22/#23 PoC-First** — Web Build (#23) wurde als Proof-of-Concept vor der fertigen Template Engine (#22) umgesetzt, um den Export-Pfad zu validieren. Basierend auf den Erkenntnissen wurde die `pet-build`-CLI und das Backend-Export-API gebaut. #22 und #23 sind jetzt in einem Schritt abgeschlossen.
 
 ## Reihenfolge
 
