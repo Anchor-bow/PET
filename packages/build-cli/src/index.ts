@@ -84,9 +84,10 @@ export async function buildApp(templateDir: string, appJsonPath: string, outputD
 
   try {
     mkdirSync(outputDir, { recursive: true });
-    execSync(`npx vite build --outDir "${outputDir}"`, {
+    execSync('npm run build', {
       cwd: templateDir,
       stdio: 'inherit',
+      env: { ...process.env, PET_OUTPUT_DIR: outputDir },
     });
     console.log(`\n✓ Build complete! Output: ${outputDir}`);
   } finally {

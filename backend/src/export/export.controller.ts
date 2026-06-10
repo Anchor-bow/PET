@@ -19,4 +19,21 @@ export class ExportController {
 
     return new StreamableFile(stream);
   }
+
+  @Post('desktop')
+  async exportDesktop(@Param('appId') appId: string, @Res({ passthrough: true }) res: Response) {
+    const { stream, filename } = await this.exportService.exportDesktopApp(appId);
+
+    const ext = filename.endsWith('.exe') ? 'application/vnd.microsoft.portable-executable'
+      : filename.endsWith('.dmg') ? 'application/x-apple-diskimage'
+      : filename.endsWith('.AppImage') ? 'application/x-iso9660-image'
+      : 'application/octet-stream';
+
+    res.set({
+      'Content-Type': ext,
+      'Content-Disposition': `attachment; filename="${filename}"`,
+    });
+
+    return new StreamableFile(stream);
+  }
 }

@@ -51,3 +51,12 @@ export async function exportAppWeb(id: string): Promise<Blob> {
   );
   return data;
 }
+
+export async function exportAppDesktop(id: string): Promise<Blob> {
+  const { data } = await apiClient.post<Blob>(
+    `/apps/${id}/export/desktop`,
+    {},
+    { responseType: 'blob' },
+  );
+  return data;
+}

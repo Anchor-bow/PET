@@ -10,7 +10,7 @@ import {
 } from '../components/builder';
 import { PageEditor } from '../components/builder/PageEditor';
 import { useAppStore } from '../store/useAppStore';
-import { exportAppWeb } from '../api/apps';
+import { exportAppWeb, exportAppDesktop } from '../api/apps';
 
 export function EditorPage() {
   const { appId } = useParams();
@@ -43,6 +43,7 @@ export function EditorPage() {
   const [confirmDeletePageId, setConfirmDeletePageId] = useState<string | null>(null);
   const [showMedia, setShowMedia] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportingDesktop, setIsExportingDesktop] = useState(false);
   const handleExport = useCallback(async () => {
     if (!appId) return;
     setIsExporting(true);
@@ -60,6 +61,26 @@ export function EditorPage() {
       alert('Export fehlgeschlagen.');
     } finally {
       setIsExporting(false);
+    }
+  }, [appId]);
+
+  const handleExportDesktop = useCallback(async () => {
+    if (!appId) return;
+    setIsExportingDesktop(true);
+    try {
+      const blob = await exportAppDesktop(appId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${appId}-setup.exe`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('Desktop-Export fehlgeschlagen. Ist electron-builder installiert?');
+    } finally {
+      setIsExportingDesktop(false);
     }
   }, [appId]);
 
@@ -202,9 +223,17 @@ export function EditorPage() {
             type="button"
             onClick={handleExport}
             disabled={isExporting}
-            title="App als Web-App exportieren"
+            title="App als Web-App exportieren (ZIP)"
           >
-            {isExporting ? 'Exportiere…' : 'Exportieren'}
+            {isExporting ? 'Exportiere…' : 'Web-Export'}
+          </button>
+          <button
+            type="button"
+            onClick={handleExportDesktop}
+            disabled={isExportingDesktop}
+            title="App als Desktop-App exportieren (.exe)"
+          >
+            {isExportingDesktop ? 'Exportiere…' : 'Desktop-Export'}
           </button>
         </div>
         <div className="page-tabs">

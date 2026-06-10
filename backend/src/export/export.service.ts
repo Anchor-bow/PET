@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync, rmSync, createWriteStream, createReadStream } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync, rmSync, createWriteStream, createReadStream, readdirSync } from 'node:fs';
 import { Readable } from 'node:stream';
-import { resolve } from 'node:path';
+import { resolve, join } from 'node:path';
 import { ZipArchive } from 'archiver';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -14,52 +14,98 @@ const TEMP_BASE = resolve(MONOREPO_ROOT, 'node_modules', '.export-tmp');
 export class ExportService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async exportWebApp(appId: string): Promise<{ stream: Readable; filename: string }> {
+  private async getAppOrThrow(appId: string) {
     const app = await this.prisma.app.findUnique({ where: { id: appId } });
     if (!app) {
       throw new NotFoundException(`App with id "${appId}" was not found.`);
     }
+    return app;
+  }
 
+  private ensureBuildCli() {
     if (!existsSync(BUILD_CLI)) {
       throw new BadRequestException(
         'Build CLI is not built. Run: pnpm --filter @pet/build-cli run build',
       );
     }
+  }
 
-    const safeId = appId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  private buildApp(safeId: string, template: string, schema: Record<string, unknown>): string {
     const workDir = resolve(TEMP_BASE, safeId);
-    const distDir = resolve(workDir, 'dist');
+    const outputDir = resolve(workDir, 'output');
     const inputPath = resolve(workDir, 'app.json');
 
     rmSync(workDir, { recursive: true, force: true });
     mkdirSync(workDir, { recursive: true });
-    writeFileSync(inputPath, JSON.stringify(app.schema, null, 2), 'utf-8');
+    writeFileSync(inputPath, JSON.stringify(schema, null, 2), 'utf-8');
 
     try {
       execSync(
-        `node "${BUILD_CLI}" --input "${inputPath}" --output "${distDir}" --template web`,
-        { cwd: MONOREPO_ROOT, stdio: 'pipe', timeout: 120_000 },
+        `node "${BUILD_CLI}" --input "${inputPath}" --output "${outputDir}" --template ${template}`,
+        { cwd: MONOREPO_ROOT, stdio: 'pipe', timeout: 300_000 },
       );
     } catch {
       rmSync(workDir, { recursive: true, force: true });
-      throw new BadRequestException('Export build failed.');
+      throw new BadRequestException(`Export build failed for template "${template}".`);
     }
 
-    if (!existsSync(distDir)) {
+    return workDir;
+  }
+
+  async exportWebApp(appId: string): Promise<{ stream: Readable; filename: string }> {
+    const app = await this.getAppOrThrow(appId);
+    this.ensureBuildCli();
+
+    const safeId = app.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const schema = app.schema as Record<string, unknown>;
+    const workDir = this.buildApp(safeId, 'web', schema);
+    const outputDir = resolve(workDir, 'output');
+
+    if (!existsSync(outputDir)) {
       rmSync(workDir, { recursive: true, force: true });
       throw new BadRequestException('Build completed but no output was produced.');
     }
 
     const zipPath = resolve(workDir, `${safeId}-web.zip`);
-    await this.zipDirectory(distDir, zipPath);
+    await this.zipDirectory(outputDir, zipPath);
 
-    rmSync(distDir, { recursive: true, force: true });
+    rmSync(outputDir, { recursive: true, force: true });
 
     const stream = createReadStream(zipPath);
     stream.on('close', () => rmSync(workDir, { recursive: true, force: true }));
     stream.on('error', () => rmSync(workDir, { recursive: true, force: true }));
 
     return { stream, filename: `${safeId}-web.zip` };
+  }
+
+  async exportDesktopApp(appId: string): Promise<{ stream: Readable; filename: string }> {
+    const app = await this.getAppOrThrow(appId);
+    this.ensureBuildCli();
+
+    const safeId = app.id.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const schema = app.schema as Record<string, unknown>;
+    const workDir = this.buildApp(safeId, 'desktop', schema);
+    const outputDir = resolve(workDir, 'output');
+
+    if (!existsSync(outputDir)) {
+      rmSync(workDir, { recursive: true, force: true });
+      throw new BadRequestException('Build completed but no output was produced.');
+    }
+
+    const files = readdirSync(outputDir);
+    const installer = files.find((f) => f.endsWith('.exe') || f.endsWith('.dmg') || f.endsWith('.AppImage'));
+
+    if (!installer) {
+      rmSync(workDir, { recursive: true, force: true });
+      throw new BadRequestException('No installer file found in build output.');
+    }
+
+    const installerPath = join(outputDir, installer);
+    const stream = createReadStream(installerPath);
+    stream.on('close', () => rmSync(workDir, { recursive: true, force: true }));
+    stream.on('error', () => rmSync(workDir, { recursive: true, force: true }));
+
+    return { stream, filename: installer };
   }
 
   private zipDirectory(sourceDir: string, outPath: string): Promise<void> {
