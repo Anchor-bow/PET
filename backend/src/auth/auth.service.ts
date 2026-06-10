@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
+import { LicenseService } from '../license/license.service';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -12,6 +13,7 @@ export class AuthService implements OnModuleInit {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly licenseService: LicenseService,
     config: ConfigService,
   ) {
     this.adminPassword = config.get<string>('ADMIN_PASSWORD', 'admin');
@@ -32,7 +34,8 @@ export class AuthService implements OnModuleInit {
     if (!user) throw new UnauthorizedException('Invalid credentials');
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
-    const payload = { sub: user.id, email: user.email };
+    const isLicensed = await this.licenseService.isUserLicensed(user.id);
+    const payload = { sub: user.id, email: user.email, isLicensed };
     return { accessToken: this.jwtService.sign(payload) };
   }
 }

@@ -8,6 +8,7 @@ import {
   type ComponentNode,
   type ComponentStyles,
 } from '@pet/types';
+import { useRuntime } from './RuntimeProvider';
 
 function toStyle(styles: ComponentStyles | undefined): CSSProperties | undefined {
   if (!styles) return undefined;
@@ -56,11 +57,12 @@ export function TextPrimitive({ node }: PrimitiveProps) {
 
 export function ButtonPrimitive({ node, onAction }: PrimitiveProps) {
   const props = buttonPropsSchema.parse(node.props);
+  const { isLicensed } = useRuntime();
   return (
     <button
       type="button"
       className={`runtime-button runtime-button-${props.variant}`}
-      disabled={props.disabled}
+      disabled={props.disabled || !isLicensed}
       style={toStyle(node.styles)}
       onClick={onAction?.onClick}
     >
@@ -71,6 +73,7 @@ export function ButtonPrimitive({ node, onAction }: PrimitiveProps) {
 
 export function InputPrimitive({ node, onAction, value, onChange }: PrimitiveProps) {
   const props = inputPropsSchema.parse(node.props);
+  const { isLicensed } = useRuntime();
   return (
     <label className="runtime-input" style={toStyle(node.styles)}>
       {props.label && <span className="runtime-input-label">{props.label}</span>}
@@ -79,6 +82,7 @@ export function InputPrimitive({ node, onAction, value, onChange }: PrimitivePro
         placeholder={props.placeholder}
         value={value ?? props.value}
         required={props.required}
+        disabled={!isLicensed}
         onChange={(e) => {
           onChange?.(e.target.value);
           onAction?.onChange?.();

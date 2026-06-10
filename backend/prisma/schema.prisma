@@ -1,6 +1,3 @@
-// Prisma Schema — Phase 2 (Grundsystem)
-// Tiefere Modelle folgen in Phase 4 (App-Datenmodell) und Phase 15 (Auth).
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum LicenseStatus {
+  ACTIVE
+  REVOKED
+  EXPIRED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -17,6 +20,8 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  licenseConsumptions LicenseConsumption[]
 }
 
 model App {
@@ -30,6 +35,37 @@ model App {
   records Record[]
   relationRecords RelationRecord[]
   fileMetadata FileMetadata[]
+  licenses License[]
+}
+
+model License {
+  id        String        @id @default(cuid())
+  key       String        @unique
+  app       App           @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId     String
+  customer  String?
+  maxUsers  Int           @default(1)
+  usedCount Int           @default(0)
+  status    LicenseStatus @default(ACTIVE)
+  expiresAt DateTime?
+  lastUsedAt DateTime?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  consumptions LicenseConsumption[]
+
+  @@index([appId])
+}
+
+model LicenseConsumption {
+  id        String   @id @default(cuid())
+  license   License  @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  licenseId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@unique([licenseId, userId])
 }
 
 model Record {
@@ -63,8 +99,8 @@ model RelationRecord {
   id              String   @id @default(cuid())
   appId           String
   sourceTableId   String
-  sourceRecordId  String
   targetTableId   String
+  sourceRecordId  String
   targetRecordId  String
   createdAt       DateTime @default(now())
 

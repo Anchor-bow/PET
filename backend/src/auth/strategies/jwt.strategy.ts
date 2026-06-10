@@ -7,6 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 interface JwtPayload {
   sub: string;
   email: string;
+  isLicensed?: boolean;
 }
 
 @Injectable()
@@ -25,6 +26,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload) {
     const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
     if (!user) throw new UnauthorizedException();
-    return { id: user.id, email: user.email, name: user.name };
+    return { id: user.id, email: user.email, name: user.name, isLicensed: payload.isLicensed ?? false };
   }
 }

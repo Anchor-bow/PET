@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { LicenseModule } from '../license/license.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         signOptions: { expiresIn: config.get<string>('JWT_EXPIRES_IN', '1h') as any },
       }),
     }),
+    LicenseModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

@@ -3,6 +3,7 @@ import { Layout } from './components/Layout';
 import { ProtectedLayout } from './components/ProtectedLayout';
 import { DashboardPage } from './pages/DashboardPage';
 import { EditorPage } from './pages/EditorPage';
+import { LicensePage } from './pages/LicensePage';
 import { LoginPage } from './pages/LoginPage';
 import { PreviewPage } from './pages/PreviewPage';
 
@@ -14,6 +15,7 @@ export function App() {
         <Route element={<Layout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/licenses" element={<LicensePage />} />
           <Route path="/editor/:appId?" element={<EditorPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>

@@ -8,6 +8,7 @@ import { CrudGeneratorModule } from './crud-generator/crud-generator.module';
 import { DbBuilderModule } from './db-builder/db-builder.module';
 import { EmailModule } from './email/email.module';
 import { ExportModule } from './export/export.module';
+import { LicenseModule } from './license/license.module';
 import { MediaModule } from './media/media.module';
 import { QueryBuilderModule } from './query-builder/query-builder.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -23,6 +24,7 @@ import { PrismaModule } from './prisma/prisma.module';
     DbBuilderModule,
     EmailModule,
     ExportModule,
+    LicenseModule,
     MediaModule,
     QueryBuilderModule,
     CrudGeneratorModule,

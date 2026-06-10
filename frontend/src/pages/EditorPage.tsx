@@ -371,6 +371,7 @@ export function EditorPage() {
             app={currentAppDraft}
             pageId={previewPageId ?? currentAppDraft.defaultPageId}
             onPageChange={setPreviewPageId}
+            isLicensed
           />
         </div>
       ) : (

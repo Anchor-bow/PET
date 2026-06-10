@@ -15,6 +15,7 @@ export interface RuntimeContextValue {
   getPagePath: (pageId: string) => string | undefined;
   getInputValue: (nodeId: string) => string | undefined;
   setInputValue: (nodeId: string, value: string) => void;
+  isLicensed: boolean;
 }
 
 const RuntimeContext = createContext<RuntimeContextValue | null>(null);
@@ -51,9 +52,10 @@ interface RuntimeProviderProps {
   pageId?: string;
   onPageChange?: (pageId: string) => void;
   children?: ReactNode;
+  isLicensed?: boolean;
 }
 
-export function RuntimeProvider({ app, pageId: externalPageId, onPageChange, children }: RuntimeProviderProps) {
+export function RuntimeProvider({ app, pageId: externalPageId, onPageChange, children, isLicensed = false }: RuntimeProviderProps) {
   const [internal, dispatch] = useReducer(reducer, {
     pageId: externalPageId ?? app.defaultPageId,
     runtimeState: {},
@@ -130,6 +132,7 @@ export function RuntimeProvider({ app, pageId: externalPageId, onPageChange, chi
       getPagePath,
       getInputValue,
       setInputValue,
+      isLicensed,
     }),
     [
       app,
@@ -142,6 +145,7 @@ export function RuntimeProvider({ app, pageId: externalPageId, onPageChange, chi
       getPagePath,
       getInputValue,
       setInputValue,
+      isLicensed,
     ],
   );
 

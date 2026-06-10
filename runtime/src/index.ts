@@ -2,6 +2,7 @@ export { RuntimeRenderer } from './RuntimeRenderer';
 export type { RuntimeRendererProps } from './RuntimeRenderer';
 export { RuntimeProvider, useRuntime } from './RuntimeProvider';
 export type { RuntimeContextValue, RuntimeState } from './RuntimeProvider';
+export { WatermarkOverlay } from './WatermarkOverlay';
 export { RuntimePageRenderer } from './RuntimePageRenderer';
 export { RuntimeComponentRenderer } from './RuntimeComponentRenderer';
 export {

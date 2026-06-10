@@ -15,6 +15,9 @@ export function Layout() {
           <NavLink to="/editor" className="sidebar-link">
             Editor
           </NavLink>
+          <NavLink to="/licenses" className="sidebar-link">
+            Lizenzen
+          </NavLink>
         </nav>
         <div className="sidebar-spacer" />
         <button className="sidebar-logout" onClick={logout}>
