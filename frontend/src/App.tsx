@@ -15,9 +15,9 @@ export function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/editor/:appId?" element={<EditorPage />} />
-          <Route path="/preview/:appId" element={<PreviewPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
+        <Route path="/preview/:appId" element={<PreviewPage />} />
       </Route>
     </Routes>
   );
