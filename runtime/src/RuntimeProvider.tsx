@@ -48,24 +48,32 @@ function reducer(state: InternalState, action: Action): InternalState {
 
 interface RuntimeProviderProps {
   app: AppDefinition;
+  pageId?: string;
+  onPageChange?: (pageId: string) => void;
   children?: ReactNode;
 }
 
-export function RuntimeProvider({ app, children }: RuntimeProviderProps) {
+export function RuntimeProvider({ app, pageId: externalPageId, onPageChange, children }: RuntimeProviderProps) {
   const [internal, dispatch] = useReducer(reducer, {
-    pageId: app.defaultPageId,
+    pageId: externalPageId ?? app.defaultPageId,
     runtimeState: {},
     inputState: {},
   });
 
+  const resolvedPageId = externalPageId ?? internal.pageId;
+
   const currentPage = useMemo(
-    () => app.pages.find((p) => p.id === internal.pageId) ?? null,
-    [app.pages, internal.pageId],
+    () => app.pages.find((p) => p.id === resolvedPageId) ?? null,
+    [app.pages, resolvedPageId],
   );
 
   const navigate = useCallback((pageId: string) => {
-    dispatch({ type: 'NAVIGATE', pageId });
-  }, []);
+    if (onPageChange) {
+      onPageChange(pageId);
+    } else {
+      dispatch({ type: 'NAVIGATE', pageId });
+    }
+  }, [onPageChange]);
 
   const setRuntimeState = useCallback(
     (updater: (prev: RuntimeState) => RuntimeState) => {
@@ -113,7 +121,7 @@ export function RuntimeProvider({ app, children }: RuntimeProviderProps) {
   const value: RuntimeContextValue = useMemo(
     () => ({
       app,
-      currentPageId: internal.pageId,
+      currentPageId: resolvedPageId,
       currentPage,
       navigate,
       state: internal.runtimeState,
@@ -125,7 +133,7 @@ export function RuntimeProvider({ app, children }: RuntimeProviderProps) {
     }),
     [
       app,
-      internal.pageId,
+      resolvedPageId,
       internal.runtimeState,
       currentPage,
       navigate,

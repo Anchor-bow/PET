@@ -26,7 +26,8 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 18    | Email Integration                | ✅ erledigt         |
 | 19    | SMS Integration                  | ➖ zurückgestellt    |
 | 20    | Runtime Renderer                 | ✅ erledigt         |
-| 21–27 | siehe Übersicht                  | ⏳ offen            |
+| 21    | Preview Mode                     | ✅ erledigt         |
+| 22–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -45,13 +46,13 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 11  | Actions System                   | 5           | #6, #7       |
 | 12  | Backend DB Builder               | 5           | #4           |
 | 13  | CRUD API Generator               | 4           | #12          |
-| 14  | Relations System                 | 5           | #12          | ✅
-| 15  | Auth System                      | 2           | #2           | ✅
-| 16    | Rollen & Berechtigungen          | 4           | #15          | ➖ übersprungen (Single-User)
-| 17  | File Upload System               | 3           | #2           | ✅
-| 18  | Email Integration                | 2           | #2           | ✅
-| 19  | SMS Integration                  | 3           | #2           | ➖ zurückgestellt
-| 20  | Runtime Renderer                 | 5           | #4, #7, #11  | ✅
+| 14  | Relations System                 | 5           | #12          |
+| 15  | Auth System                      | 2           | #2           |
+| 16  | Rollen & Berechtigungen          | 4           | #15          |
+| 17  | File Upload System               | 3           | #2           |
+| 18  | Email Integration                | 2           | #2           |
+| 19  | SMS Integration                  | 3           | #2           |
+| 20  | Runtime Renderer                 | 5           | #4, #7, #11  |
 | 21  | Preview Mode                     | 4           | #20          |
 | 22  | Template Engine                  | 4           | #4           |
 | 23  | Web Build                        | 2           | #22          |
@@ -68,6 +69,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 - **#12** Backend DB Builder — Datenebene ✅
 - **#14** Relations System — Daten verknüpfen ✅
 - **#20** Runtime Renderer — App-Ausführung ✅
+- **#21** Preview Mode — App testen im Builder ✅
 
 ---
 

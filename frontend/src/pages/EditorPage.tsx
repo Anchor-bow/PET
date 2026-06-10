@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { RuntimeRenderer } from '@pet/runtime';
 import {
   BuilderCanvas,
   BuilderDndContext,
@@ -34,6 +35,8 @@ export function EditorPage() {
     removePage,
   } = useAppStore();
 
+  const [previewMode, setPreviewMode] = useState(false);
+  const [previewPageId, setPreviewPageId] = useState<string | null>(null);
   const [newPageName, setNewPageName] = useState('');
   const [pageEditorPageId, setPageEditorPageId] = useState<string | null>(null);
   const [confirmDeletePageId, setConfirmDeletePageId] = useState<string | null>(null);
@@ -150,63 +153,104 @@ export function EditorPage() {
           <button type="button" onClick={() => { setShowMedia((v) => !v); setPageEditorPageId(null); }}>
             {showMedia ? 'Eigenschaften' : 'Mediathek'}
           </button>
+          <button
+            type="button"
+            className={previewMode ? 'preview-toggle preview-toggle--active' : 'preview-toggle'}
+            onClick={() => {
+              if (previewMode) {
+                setPreviewMode(false);
+              } else {
+                setPreviewPageId(currentPageId);
+                setPreviewMode(true);
+              }
+            }}
+          >
+            {previewMode ? 'Editor' : 'Vorschau'}
+          </button>
+          {previewMode && appId && (
+            <a
+              href={`/preview/${appId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="preview-open-tab"
+            >
+              In neuem Tab öffnen
+            </a>
+          )}
         </div>
         <div className="page-tabs">
-          {currentAppDraft.pages.map((page) => (
-            <div
-              key={page.id}
-              className={`page-tab${page.id === currentPageId ? ' page-tab--active' : ''}`}
-            >
-              <button
-                type="button"
-                className="page-tab__btn"
-                onClick={() => setCurrentPage(page.id)}
-                title={`Zu "${page.name}" wechseln`}
+          {currentAppDraft.pages.map((page) => {
+            const isActivePage = previewMode
+              ? page.id === previewPageId
+              : page.id === currentPageId;
+            return (
+              <div
+                key={page.id}
+                className={`page-tab${isActivePage ? ' page-tab--active' : ''}`}
               >
-                {page.name}
-                {page.id === currentAppDraft.defaultPageId && (
-                  <span className="page-tab__default" title="Startseite">★</span>
+                <button
+                  type="button"
+                  className="page-tab__btn"
+                  onClick={() => {
+                    if (previewMode) {
+                      setPreviewPageId(page.id);
+                    } else {
+                      setCurrentPage(page.id);
+                    }
+                  }}
+                  title={`Zu "${page.name}" wechseln`}
+                >
+                  {page.name}
+                  {page.id === currentAppDraft.defaultPageId && (
+                    <span className="page-tab__default" title="Startseite">★</span>
+                  )}
+                </button>
+                {!previewMode && (
+                  <>
+                    <button
+                      type="button"
+                      className="page-tab__edit"
+                      onClick={() => setPageEditorPageId(page.id)}
+                      title="Seite bearbeiten"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      type="button"
+                      className="page-tab__delete"
+                      onClick={() => setConfirmDeletePageId(page.id)}
+                      disabled={currentAppDraft.pages.length <= 1}
+                      title="Seite löschen"
+                    >
+                      🗑
+                    </button>
+                  </>
                 )}
-              </button>
+              </div>
+            );
+          })}
+          {!previewMode && (
+            <div className="page-tab page-tab--add">
+              <input
+                type="text"
+                className="page-tab__input"
+                placeholder="Neue Seite"
+                value={newPageName}
+                onChange={(e) => setNewPageName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddPage();
+                }}
+              />
               <button
                 type="button"
-                className="page-tab__edit"
-                onClick={() => setPageEditorPageId(page.id)}
-                title="Seite bearbeiten"
+                className="page-tab__add-btn"
+                onClick={handleAddPage}
+                title="Seite hinzufügen"
               >
-                ✏️
-              </button>
-              <button
-                type="button"
-                className="page-tab__delete"
-                onClick={() => setConfirmDeletePageId(page.id)}
-                disabled={currentAppDraft.pages.length <= 1}
-                title="Seite löschen"
-              >
-                🗑
+                +
               </button>
             </div>
-          ))}
-          <div className="page-tab page-tab--add">
-            <input
-              type="text"
-              className="page-tab__input"
-              placeholder="Neue Seite"
-              value={newPageName}
-              onChange={(e) => setNewPageName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleAddPage();
-              }}
-            />
-            <button
-              type="button"
-              className="page-tab__add-btn"
-              onClick={handleAddPage}
-              title="Seite hinzufügen"
-            >
-              +
-            </button>
-          </div>
+          )}
         </div>
       </header>
 
@@ -234,25 +278,35 @@ export function EditorPage() {
         </div>
       )}
 
-      <BuilderDndContext>
-        <div className="editor-workspace">
-          <ComponentPalette />
-          <div className="editor-canvas" onClick={() => setSelectedNode(null)}>
-            {currentPage ? (
-              <BuilderCanvas root={currentPage.root} />
+      {previewMode && currentAppDraft ? (
+        <div className="editor-preview">
+          <RuntimeRenderer
+            app={currentAppDraft}
+            pageId={previewPageId ?? currentAppDraft.defaultPageId}
+            onPageChange={setPreviewPageId}
+          />
+        </div>
+      ) : (
+        <BuilderDndContext>
+          <div className="editor-workspace">
+            <ComponentPalette />
+            <div className="editor-canvas" onClick={() => setSelectedNode(null)}>
+              {currentPage ? (
+                <BuilderCanvas root={currentPage.root} />
+              ) : (
+                <p className="empty">Keine Seite vorhanden.</p>
+              )}
+            </div>
+            {editingPage ? (
+              <PageEditor page={editingPage} onClose={() => setPageEditorPageId(null)} />
+            ) : showMedia ? (
+              <MediaLibrary />
             ) : (
-              <p className="empty">Keine Seite vorhanden.</p>
+              <PropertyEditor />
             )}
           </div>
-          {editingPage ? (
-            <PageEditor page={editingPage} onClose={() => setPageEditorPageId(null)} />
-          ) : showMedia ? (
-            <MediaLibrary />
-          ) : (
-            <PropertyEditor />
-          )}
-        </div>
-      </BuilderDndContext>
+        </BuilderDndContext>
+      )}
     </section>
   );
 }

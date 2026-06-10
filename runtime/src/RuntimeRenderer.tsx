@@ -4,11 +4,13 @@ import { RuntimePageRenderer } from './RuntimePageRenderer';
 
 export interface RuntimeRendererProps {
   app: AppDefinition;
+  pageId?: string;
+  onPageChange?: (pageId: string) => void;
 }
 
-export function RuntimeRenderer({ app }: RuntimeRendererProps) {
+export function RuntimeRenderer({ app, pageId, onPageChange }: RuntimeRendererProps) {
   return (
-    <RuntimeProvider app={app}>
+    <RuntimeProvider app={app} pageId={pageId} onPageChange={onPageChange}>
       <RuntimePageRenderer />
     </RuntimeProvider>
   );

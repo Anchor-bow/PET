@@ -144,6 +144,9 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@18.3.1)
+      '@pet/runtime':
+        specifier: workspace:*
+        version: link:../runtime
       '@pet/types':
         specifier: workspace:*
         version: link:../packages/types
