@@ -43,6 +43,25 @@ export function EditorPage() {
   const [confirmDeletePageId, setConfirmDeletePageId] = useState<string | null>(null);
   const [showMedia, setShowMedia] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const handleExport = useCallback(async () => {
+    if (!appId) return;
+    setIsExporting(true);
+    try {
+      const blob = await exportAppWeb(appId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${appId}-web.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('Export fehlgeschlagen.');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [appId]);
 
   useEffect(() => {
     if (appId) {
@@ -117,26 +136,6 @@ export function EditorPage() {
     removePage(confirmDeletePageId);
     setConfirmDeletePageId(null);
   };
-
-  const handleExport = useCallback(async () => {
-    if (!appId) return;
-    setIsExporting(true);
-    try {
-      const blob = await exportAppWeb(appId);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${appId}-web.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch {
-      alert('Export fehlgeschlagen.');
-    } finally {
-      setIsExporting(false);
-    }
-  }, [appId]);
 
   const editingPage = pageEditorPageId
     ? currentAppDraft.pages.find((p) => p.id === pageEditorPageId) ?? null
