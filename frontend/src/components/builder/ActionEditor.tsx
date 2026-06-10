@@ -156,17 +156,24 @@ function PayloadEditor({ type, payload, onChange }: PayloadEditorProps) {
 }
 
 function NavigatePayload({ payload, onSet }: { payload: Record<string, JsonValue>; onSet: (k: string, v: JsonValue) => void }) {
+  const pages = useAppStore((s) => s.currentAppDraft?.pages ?? []);
+
   return (
     <div className="action-editor__payload">
       <label className="action-editor__field">
-        <span className="action-editor__label">Ziel-Seiten-ID</span>
-        <input
-          className="action-editor__input"
-          type="text"
+        <span className="action-editor__label">Ziel-Seite</span>
+        <select
+          className="action-editor__select"
           value={(payload.targetPageId as string) ?? ''}
-          placeholder="page-id"
           onChange={(e) => onSet('targetPageId', e.target.value)}
-        />
+        >
+          <option value="">— Seite wählen —</option>
+          {pages.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
       </label>
     </div>
   );

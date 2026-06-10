@@ -5,9 +5,10 @@ import {
   BuilderCanvas,
   BuilderDndContext,
   ComponentPalette,
+  DbBuilderModal,
+  DetachablePanel,
   MediaLibrary,
   PropertyEditor,
-  DetachablePanel,
 } from '../components/builder';
 import { PageEditor } from '../components/builder/PageEditor';
 import { useAppStore } from '../store/useAppStore';
@@ -43,6 +44,7 @@ export function EditorPage() {
   const [pageEditorPageId, setPageEditorPageId] = useState<string | null>(null);
   const [confirmDeletePageId, setConfirmDeletePageId] = useState<string | null>(null);
   const [showMedia, setShowMedia] = useState(false);
+  const [showDbBuilder, setShowDbBuilder] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingDesktop, setIsExportingDesktop] = useState(false);
   const [paletteDetached, setPaletteDetached] = useState(false);
@@ -218,6 +220,9 @@ export function EditorPage() {
           </button>
           <button type="button" onClick={() => { setShowMedia((v) => !v); setPageEditorPageId(null); }}>
             {showMedia ? 'Eigenschaften' : 'Mediathek'}
+          </button>
+          <button type="button" onClick={() => { setShowDbBuilder((v) => !v); setShowMedia(false); }}>
+            Datenbank
           </button>
           <button
             type="button"
@@ -402,6 +407,8 @@ export function EditorPage() {
           </div>
         </BuilderDndContext>
       )}
+
+      {showDbBuilder && <DbBuilderModal onClose={() => setShowDbBuilder(false)} />}
     </section>
   );
 }

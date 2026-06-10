@@ -32,10 +32,10 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 24   | Desktop Build (Electron)         | ✅ erledigt         |
 | 25   | Android Build (Capacitor)        | ✅ erledigt         |
 | 26   | Lizenzsystem                     | ✅ erledigt         |
-| 27   | PET Design (Farben, Stil, Layout) | 🏗️ in Arbeit        |
-| 28   | UI Aufbau (Editor-Layout)        | 🏗️ in Arbeit        |
-| 29   | Seiten ID vereinfachen           | ⏳ offen            |
-| 30   | DB Builder UI                    | ⏳ offen            |
+| 27   | PET Design (Farben, Stil, Layout) | ✅ erledigt         |
+| 28   | UI Aufbau (Editor-Layout)        | ✅ erledigt         |
+| 29   | Seiten ID vereinfachen           | ✅ erledigt         |
+| 30   | DB Builder UI                    | ✅ erledigt         |
 | 31   | Device Preview                   | ⏳ offen            |
 | 32   | Backup & Restore                 | ⏳ offen            |
 | 33   | Erweiterte Actions               | ⏳ offen            |
@@ -76,9 +76,9 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 21  | Preview Mode                     | 4           | #20          |
 | 22  | Template Engine                  | 4           | #4           |
 | 23  | Web Build                        | 2           | #22          |
-| 24  | Desktop Build (Electron)         | 4           | #22          | ✅ erledigt |
-| 25   | Android Build (Capacitor)        | 5           | #22          | ✅ erledigt |
-| 26   | Lizenzsystem                     | 3           | #2, #20      | ✅ erledigt |
+| 24  | Desktop Build (Electron)         | 4           | #22          |
+| 25   | Android Build (Capacitor)        | 5           | #22          |
+| 26   | Lizenzsystem                     | 3           | #2, #20      |
 | 27   | PET Design (Farben, Stil, Layout) | 3           | —             |
 | 28   | UI Aufbau (Editor-Layout)        | 4           | #27           |
 | 29   | Seiten ID vereinfachen           | 2           | #28           |
@@ -393,7 +393,7 @@ Ziel: Monetarisierung.
 - Runtime-Validierung
 - Ablaufdatum
 
-### 27 — PET Design (Farben, Stil, Layout) ⏳
+### 27 — PET Design (Farben, Stil, Layout) ✅
 
 Ziel: Einheitliches, modernes Design für das gesamte PET-Programm.
 
@@ -411,7 +411,7 @@ Ziel: Einheitliches, modernes Design für das gesamte PET-Programm.
 - **Fokus auf Lesbarkeit**: Ausreichende Schriftgrößen, Zeilenabstände, Kontraste
 - **Hinweis zu Building Blocks**: Die späteren Building Blocks (Phasen 34–42) erben diesen modernen Stil (abgerundete Ecken, Grid-Layout, einheitliches Spacing). Ihre spezifischen Farben (Akzente, Button-Farben, Hintergründe) werden jedoch später vom User im Editor pro App definiert – sie gehören zur App des Users, nicht zum PET-Programm.
 
-### 28 — UI Aufbau (Editor-Layout) 🏗️
+### 28 — UI Aufbau (Editor-Layout) ✅
 
 Ziel: Editor-Layout grundlegend überarbeiten und an das neue Design anpassen.
 
@@ -421,21 +421,23 @@ Ziel: Editor-Layout grundlegend überarbeiten und an das neue Design anpassen.
 - **Responsives Verhalten**: Editor bei kleineren Fenstern nutzbar, Panels einklappbar.
 - **Dark Mode Support**: Theme-Umschalter in der Sidebar (bereits in Phase 27 implementiert).
 
-### 29 — Seiten ID vereinfachen ⏳
+### 29 — Seiten ID vereinfachen ✅
 
 Ziel: Benutzerfreundlichkeit im Action-Editor verbessern.
 
 - Im Action-Editor (Navigation-Action) statt roher UUID-Eingabe ein Dropdown mit allen verfügbaren Seiten anzeigen
 - An anderen Stellen, wo aktuell IDs manuell eingegeben werden müssen, ebenfalls Dropdowns oder Auswahlhilfen bereitstellen
 
-### 30 — DB Builder UI ⏳
+### 30 — DB Builder UI ✅
 
-Ziel: Frontend-UI für den Backend DB Builder (Phase 12).
+Ziel: Frontend-UI für den Backend DB Builder (Phase 12) als separates Modal-Fenster.
 
-- Table-Liste im Editor-Panel (alle Tabellen der App anzeigen)
-- Table-Editor: Name + Slug bearbeiten
-- Field-Editor: Name/Typ/Required/Default pro Feld
-- Validierung und Vorschau der Tabellenstruktur
+- **Modal-Fenster**: Wird über "Datenbank"-Button in der Editor-Toolbar geöffnet. Alle DB-Operationen in einem Fenster, Editor bleibt übersichtlich.
+- **Table-Liste**: Alle Tabellen der App anzeigen, jeweils mit Slug und Feldanzahl
+- **Table-Editor**: Name + Slug bearbeiten, Felder verwalten
+- **Field-Editor**: Felder mit Name/Key/Typ/Required/Default anlegen/bearbeiten/löschen
+- **Records-Ansicht**: Daten einer Tabelle anzeigen, anlegen, bearbeiten, löschen
+- **Dynamisches Formular**: Wird aus den Feld-Definitionen generiert
 
 ### 31 — Device Preview ⏳
 

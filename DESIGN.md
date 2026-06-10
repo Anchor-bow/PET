@@ -29,6 +29,7 @@
 - **Grid-basierte Platzierung:** Felder und Buttons werden in Grids angeordnet (gleichmäßige Abstände, Ausrichtung), nicht „kreuz und quer"
 - **Kein Windows-XP-Look:** Flache Borders, dezente Hover-States, klare Typografie
 - **Fokus auf Lesbarkeit:** System-UI-Schrift, ausreichende Schriftgrößen (11–16px), Zeilenabstände, Kontraste
+- **Jedes Feld braucht einen Titel:** Jedes Eingabefeld muss eine sichtbare Beschriftung haben, die auf einen Blick erklärt, wofür das Feld genutzt wird (z. B. Kopfzeilen in der Datenbank-Tabelle: „Feldname", „Typ", „Optionen", „Pflicht"). Keine felder ohne label oder kontext.
 
 ## Typografie
 
