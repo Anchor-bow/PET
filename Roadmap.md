@@ -23,7 +23,8 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 15    | Auth System                      | ✅ erledigt         |
 | 16    | Rollen & Berechtigungen          | ➖ übersprungen      |
 | 17    | File Upload System               | ✅ erledigt         |
-| 18–27 | siehe Übersicht                  | ⏳ offen            |
+| 18    | Email Integration                | ✅ erledigt         |
+| 19–27 | siehe Übersicht                  | ⏳ offen            |
 
 ## Übersicht
 
@@ -46,7 +47,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 15  | Auth System                      | 2           | #2           | ✅
 | 16    | Rollen & Berechtigungen          | 4           | #15          | ➖ übersprungen (Single-User)
 | 17  | File Upload System               | 3           | #2           | ✅
-| 18  | Email Integration                | 2           | #2           |
+| 18  | Email Integration                | 2           | #2           | ✅
 | 19  | SMS Integration                  | 3           | #2           |
 | 20  | Runtime Renderer                 | 5           | #4, #7, #11  |
 | 21  | Preview Mode                     | 4           | #20          |

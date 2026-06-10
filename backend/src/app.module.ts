@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { AppDomainModule } from './app/app.module';
 import { CrudGeneratorModule } from './crud-generator/crud-generator.module';
 import { DbBuilderModule } from './db-builder/db-builder.module';
+import { EmailModule } from './email/email.module';
 import { MediaModule } from './media/media.module';
 import { QueryBuilderModule } from './query-builder/query-builder.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -19,6 +20,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     AppDomainModule,
     DbBuilderModule,
+    EmailModule,
     MediaModule,
     QueryBuilderModule,
     CrudGeneratorModule,
