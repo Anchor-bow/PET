@@ -1,8 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
+import { useThemeStore } from '../store/useThemeStore';
 
 export function Layout() {
   const logout = useAuthStore((s) => s.logout);
+  const { theme, toggleTheme } = useThemeStore();
 
   return (
     <div className="app-shell">
@@ -20,6 +22,9 @@ export function Layout() {
           </NavLink>
         </nav>
         <div className="sidebar-spacer" />
+        <button className="sidebar-theme-btn" onClick={toggleTheme}>
+          {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+        </button>
         <button className="sidebar-logout" onClick={logout}>
           Abmelden
         </button>

@@ -32,7 +32,22 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 24   | Desktop Build (Electron)         | ✅ erledigt         |
 | 25   | Android Build (Capacitor)        | ✅ erledigt         |
 | 26   | Lizenzsystem                     | ✅ erledigt         |
-| 27   | siehe Übersicht                  | ⏳ offen            |
+| 27   | PET Design (Farben, Stil, Layout) | 🏗️ in Arbeit        |
+| 28   | UI Aufbau (Editor-Layout)        | ⏳ offen            |
+| 29   | Seiten ID vereinfachen           | ⏳ offen            |
+| 30   | DB Builder UI                    | ⏳ offen            |
+| 31   | Device Preview                   | ⏳ offen            |
+| 32   | Backup & Restore                 | ⏳ offen            |
+| 33   | Erweiterte Actions               | ⏳ offen            |
+| 34   | Building Block: Liste            | ⏳ offen            |
+| 35   | Building Block: Tabelle          | ⏳ offen            |
+| 36   | Building Block: Card             | ⏳ offen            |
+| 37   | Building Block: Tabs             | ⏳ offen            |
+| 38   | Building Block: Form             | ⏳ offen            |
+| 39   | Building Block: Modal            | ⏳ offen            |
+| 40   | Building Block: Chart            | ⏳ offen            |
+| 41   | Building Block: Rich Text        | ⏳ offen            |
+| 42   | Building Block: Icon             | ⏳ offen            |
 
 ## Übersicht
 
@@ -64,7 +79,22 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 24  | Desktop Build (Electron)         | 4           | #22          | ✅ erledigt |
 | 25   | Android Build (Capacitor)        | 5           | #22          | ✅ erledigt |
 | 26   | Lizenzsystem                     | 3           | #2, #20      | ✅ erledigt |
-| 27  | Erweiterung: UI, Komponenten, Actions, DB UI, Device Preview & Backup | 4 | #11, #12, #20, #21 |
+| 27   | PET Design (Farben, Stil, Layout) | 3           | —             |
+| 28   | UI Aufbau (Editor-Layout)        | 4           | #27           |
+| 29   | Seiten ID vereinfachen           | 2           | #28           |
+| 30   | DB Builder UI                    | 4           | #12, #28      |
+| 31   | Device Preview                   | 3           | #20, #21, #28 |
+| 32   | Backup & Restore                 | 4           | #2, #12       |
+| 33   | Erweiterte Actions               | 5           | #11, #28      |
+| 34   | Building Block: Liste            | 3           | #7, #28, #33  |
+| 35   | Building Block: Tabelle          | 4           | #7, #28, #33  |
+| 36   | Building Block: Card             | 2           | #7, #28       |
+| 37   | Building Block: Tabs             | 3           | #7, #28       |
+| 38   | Building Block: Form             | 4           | #7, #28, #33  |
+| 39   | Building Block: Modal            | 3           | #7, #28       |
+| 40   | Building Block: Chart            | 4           | #7, #28       |
+| 41   | Building Block: Rich Text        | 4           | #7, #28       |
+| 42   | Building Block: Icon             | 2           | #7, #28       |
 
 ## Kritische Blöcke
 
@@ -363,17 +393,148 @@ Ziel: Monetarisierung.
 - Runtime-Validierung
 - Ablaufdatum
 
-### 27 — Erweiterung: UI, Komponenten, Actions, DB UI, Device Preview & Backup
+### 27 — PET Design (Farben, Stil, Layout) ⏳
 
-Ziel: Builder-Plattform erweitern + Datensicherheit.
+Ziel: Einheitliches, modernes Design für das gesamte PET-Programm.
 
-- **UI Aufbau**: Editor-Layout überarbeiten (Toolbar-Anordnung, Panel-Größen, responsives Verhalten, Dark Mode)
-- **Seiten ID vereinfachen**: Im Action-Editor (Navigation-Action) statt roher UUID-Eingabe ein Dropdown mit allen verfügbaren Seiten anzeigen. Auch an anderen Stellen, wo aktuell IDs manuell eingegeben werden müssen
-- **DB Builder UI**: Table-Liste, Table-Editor (Name + Slug), Field-Editor (Name/Typ/Required/Default) im Editor-Panel
-- **Erweiterte Komponenten**: neue UI-Bausteine (Liste, Tabelle, Card, Tabs, Form, Modal, Chart, Rich Text, Icon)
-- **Erweiterte Actions**: komplexe Workflows, Konditionale Actions, Timer/Verzögerung, Action-Chaining
-- **Device Preview**: Desktop/Tablet/Android-Viewport-Umschalter in der Preview-Leiste, damit die App in verschiedenen Zielformaten getestet werden kann
-- **Backup & Restore**: Export/Import einzelner Apps als JSON-Dump, projektweites Backup inklusive aller benutzerdefinierten Daten (Meta-Tabellen), Wiederherstellungs-UI im Builder
+- **Farben (PET-Programm)**:
+  - Light Mode: Weißer Hintergrund (`#FFFFFF`), dunkle Schrift für Kontrast
+  - Dark Mode: Schwarzer Hintergrund (`#000000`), helle Schrift für Kontrast
+  - Akzentfarbe: Orange (z. B. für Buttons, Feldumrandungen, aktive Elemente)
+  - Hinweis: Diese Farben gelten ausschließlich für das PET-Programm selbst. Die Editor-Inhalte (App des Users) verwenden separate, später definierbare Farben.
+- **Design-Stil**:
+  - Modern, sauber, aufgeräumt
+  - Abgerundete Ecken (`border-radius`) bei Buttons, Panels, Input-Feldern
+  - Einheitliche Abstände und Spacing (Grid-System)
+  - Keine „Windows XP"-Optik – flache Designs, klare Linien
+  - Grid-basierte Platzierung von Buttons und Feldern (z. B. im Property-Editor: nebeneinander, nicht kreuz und quer)
+- **Fokus auf Lesbarkeit**: Ausreichende Schriftgrößen, Zeilenabstände, Kontraste
+- **Hinweis zu Building Blocks**: Die späteren Building Blocks (Phasen 34–42) erben diesen modernen Stil (abgerundete Ecken, Grid-Layout, einheitliches Spacing). Ihre spezifischen Farben (Akzente, Button-Farben, Hintergründe) werden jedoch später vom User im Editor pro App definiert – sie gehören zur App des Users, nicht zum PET-Programm.
+
+### 28 — UI Aufbau (Editor-Layout) ⏳
+
+Ziel: Editor-Layout grundlegend überarbeiten und an das neue Design anpassen.
+
+- Toolbar-Anordnung überarbeiten (konsistent, aufgeräumt)
+- Panel-Größen flexibel gestalten (resizable panels)
+- Responsives Verhalten des Editors
+- Dark Mode Support im Editor (Umschalter)
+- Alle bestehenden PET-Oberflächen (Dashboard, Editor, Licenses) auf das neue Design migrieren
+
+### 29 — Seiten ID vereinfachen ⏳
+
+Ziel: Benutzerfreundlichkeit im Action-Editor verbessern.
+
+- Im Action-Editor (Navigation-Action) statt roher UUID-Eingabe ein Dropdown mit allen verfügbaren Seiten anzeigen
+- An anderen Stellen, wo aktuell IDs manuell eingegeben werden müssen, ebenfalls Dropdowns oder Auswahlhilfen bereitstellen
+
+### 30 — DB Builder UI ⏳
+
+Ziel: Frontend-UI für den Backend DB Builder (Phase 12).
+
+- Table-Liste im Editor-Panel (alle Tabellen der App anzeigen)
+- Table-Editor: Name + Slug bearbeiten
+- Field-Editor: Name/Typ/Required/Default pro Feld
+- Validierung und Vorschau der Tabellenstruktur
+
+### 31 — Device Preview ⏳
+
+Ziel: App in verschiedenen Zielformaten testen.
+
+- Desktop/Tablet/Android-Viewport-Umschalter in der Preview-Leiste
+- Viewport-Größen: Desktop (1920×1080), Tablet (768×1024), Mobile (375×667)
+- RuntimeRenderer skaliert entsprechend
+
+### 32 — Backup & Restore ⏳
+
+Ziel: Datensicherheit und Portabilität.
+
+- Export einzelner Apps als JSON-Dump
+- Import einzelner Apps aus JSON-Dump
+- Projektweites Backup inklusive aller benutzerdefinierten Daten (Meta-Tabellen)
+- Wiederherstellungs-UI im Builder
+
+### 33 — Erweiterte Actions ⏳
+
+Ziel: Komplexere Workflows im Action-System.
+
+- Konditionale Actions (if/else)
+- Timer/Verzögerung (Action nach X Sekunden ausführen)
+- Action-Chaining (mehrere Actions nacheinander)
+- Erweiterte Action-Typen (z. B. Daten-Transformationen)
+
+### 34 — Building Block: Liste ⏳
+
+Ziel: Listenelement als Komponente im Builder und Runtime.
+
+- Daten aus Tabellen (Records) dynamisch als Liste darstellen
+- Props: Datenquelle, Template pro Zeile, Sortierung, Filter
+- Support für Klick-Actions auf Listeneinträge
+
+### 35 — Building Block: Tabelle ⏳
+
+Ziel: Tabellenelement als Komponente im Builder und Runtime.
+
+- Dynamische Tabellendarstellung aus Tabellen-Daten
+- Props: Datenquelle, Spalten-Auswahl, Sortierung, Filter, Paginierung
+- Zeilen-Selektion und Klick-Actions
+
+### 36 — Building Block: Card ⏳
+
+Ziel: Card-Element als Komponente im Builder und Runtime.
+
+- Karte mit Bild, Titel, Beschreibung, Action-Button
+- Props: Bild-URL, Titel, Text, Action-Binding
+- Flexible Layout-Varianten (horizontal/vertikal)
+
+### 37 — Building Block: Tabs ⏳
+
+Ziel: Tab-Element als Komponente im Builder und Runtime.
+
+- Tab-Wechsel mit Content-Bereichen
+- Props: Tab-Liste (Label + Content), Default-Tab
+- Actions on Tab Change
+
+### 38 — Building Block: Form ⏳
+
+Ziel: Formular-Element als Komponente im Builder und Runtime.
+
+- Dynamisches Formular aus Tabellen-Feldern
+- Props: Datenquelle, Submit-Ziel, Validierung
+- Submit-Action: API Call, State Update, Navigation
+- Feld-Typen: Input, Select, Checkbox, Date, File
+
+### 39 — Building Block: Modal ⏳
+
+Ziel: Modal-Dialog als Komponente im Builder und Runtime.
+
+- Overlay-Dialog mit Inhalt (Text, Bild, Liste, etc.)
+- Props: Titel, Größe, Schließen-Option
+- Open/Close per Action steuerbar
+
+### 40 — Building Block: Chart ⏳
+
+Ziel: Diagramm-Element als Komponente im Builder und Runtime.
+
+- Diagramm-Typen: Balken, Linie, Kreis, Säule
+- Props: Datenquelle, Typ, Farben, Achsenbeschriftung
+- Dynamische Daten aus Tabellen
+
+### 41 — Building Block: Rich Text ⏳
+
+Ziel: Rich-Text-Editor/Anzeige als Komponente im Builder und Runtime.
+
+- Formatierte Textdarstellung (fett, kursiv, Listen, Links)
+- WYSIWYG-Editor im Builder
+- HTML/Markdown-Speicherung
+
+### 42 — Building Block: Icon ⏳
+
+Ziel: Icon-Element als Komponente im Builder und Runtime.
+
+- Icon-Auswahl aus Bibliothek (z. B. Lucide, Heroicons)
+- Props: Icon-Name, Größe, Farbe
+- Klick-Action unterstützt
 
 ---
 
@@ -385,10 +546,11 @@ Ziel: Builder-Plattform erweitern + Datensicherheit.
 
 ## Reihenfolge
 
-1. Erst Struktur
-2. Dann Builder
-3. Dann Logik
-4. Dann Runtime
-5. Dann Export
+1. Erst Struktur (Phasen 1–3)
+2. Dann Builder (Phasen 4–11)
+3. Dann Logik (Phasen 12–14)
+4. Dann Runtime (Phasen 20–21)
+5. Dann Export (Phasen 22–25)
+6. **Jetzt: PET Design + UI-Ausbau (Phasen 27–42)**
 
 Ohne diese Reihenfolge → System wird instabil und nicht erweiterbar.
