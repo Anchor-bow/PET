@@ -42,3 +42,16 @@
 - **Dark Mode:** über `data-theme="dark"` auf `<html>` — umschaltbar über einen Button in der Sidebar
 - **Persistenz:** Die Theme-Einstellung wird in `localStorage` gespeichert
 - **Auto-Detect:** Beim ersten Besuch wird `prefers-color-scheme` ausgewertet, falls keine gespeicherte Einstellung existiert
+
+## Sidebar
+
+- **Collapsible:** Die linke Sidebar kann über einen Button am unteren Rand auf 52px minimiert werden
+- **Icons:** Jeder Navigationspunkt hat ein SVG-Icon. Im collapsed-Modus werden nur die Icons angezeigt
+- **Zustand:** Wird im lokalen Component-State gehalten (nicht persistent)
+
+## Editor-Panels
+
+- **Detachable Panels:** Die Komponenten-Palette (links) und der Eigenschaften-Editor (rechts) können über einen "Loslösen"-Button vom Grid getrennt werden
+- **Floating Mode:** Im losgelösten Zustand schweben die Panels als frei verschiebbare Fenster über dem Canvas
+- **Grid-Anpassung:** Das Editor-Grid entfernt die Spalte des losgelösten Panels, sodass der Canvas die volle Breite erhält
+- **Portals:** Die Floating-Panels werden via `ReactDOM.createPortal` in `document.body` gerendert

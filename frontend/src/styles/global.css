@@ -55,12 +55,31 @@ body,
   flex-direction: column;
   padding: 16px;
   gap: 16px;
+  transition: width 200ms;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sidebar--collapsed {
+  width: 52px;
+  padding: 16px 10px;
+  gap: 12px;
+}
+
+.sidebar--collapsed .sidebar-nav {
+  align-items: center;
 }
 
 .sidebar-brand {
   font-weight: 700;
   font-size: 20px;
   letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.sidebar--collapsed .sidebar-brand {
+  text-align: center;
+  font-size: 18px;
 }
 
 .sidebar-nav {
@@ -70,11 +89,20 @@ body,
 }
 
 .sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 8px 12px;
   border-radius: var(--radius-md);
   color: var(--muted);
   text-decoration: none;
   transition: background 100ms, color 100ms;
+  white-space: nowrap;
+}
+
+.sidebar--collapsed .sidebar-link {
+  justify-content: center;
+  padding: 8px;
 }
 
 .sidebar-link:hover {
@@ -91,7 +119,12 @@ body,
   flex: 1;
 }
 
-.sidebar-logout {
+.sidebar-logout,
+.sidebar-theme-btn,
+.sidebar-collapse-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   background: transparent;
   border: 1px solid var(--border);
   color: var(--muted);
@@ -102,6 +135,14 @@ body,
   font-family: inherit;
   text-align: left;
   transition: border-color 100ms, color 100ms;
+  white-space: nowrap;
+}
+
+.sidebar--collapsed .sidebar-logout,
+.sidebar--collapsed .sidebar-theme-btn,
+.sidebar--collapsed .sidebar-collapse-btn {
+  justify-content: center;
+  padding: 8px;
 }
 
 .sidebar-logout:hover {
@@ -109,22 +150,21 @@ body,
   color: var(--error);
 }
 
-/* ── Theme Toggle ── */
-
-.sidebar-theme-btn {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--muted);
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  cursor: pointer;
-  font-family: inherit;
-  text-align: left;
-  transition: border-color 100ms, color 100ms;
+.sidebar-theme-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
 }
 
-.sidebar-theme-btn:hover {
+.sidebar-collapse-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.sidebar--collapsed .sidebar-collapse-btn {
+  border-color: transparent;
+}
+
+.sidebar-collapse-btn:hover {
   border-color: var(--accent);
   color: var(--text);
 }
@@ -491,6 +531,105 @@ body,
   grid-template-columns: 200px 1fr 280px;
   gap: 16px;
   align-items: start;
+}
+
+.editor-workspace--no-left {
+  grid-template-columns: 0 1fr 280px;
+}
+
+.editor-workspace--no-right {
+  grid-template-columns: 200px 1fr 0;
+}
+
+.editor-workspace--no-left.editor-workspace--no-right {
+  grid-template-columns: 0 1fr 0;
+}
+
+/* ── Detachable Panel ── */
+
+.detachable-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detachable-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detachable-panel__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  gap: 8px;
+}
+
+.detachable-panel__title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.detachable-panel__detach-btn,
+.detachable-panel__attach-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 100ms, color 100ms;
+}
+
+.detachable-panel__detach-btn:hover,
+.detachable-panel__attach-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.detachable-panel__float {
+  position: fixed;
+  z-index: 200;
+  width: 280px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.detachable-panel__float-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  cursor: grab;
+  user-select: none;
+}
+
+.detachable-panel__float-header:active {
+  cursor: grabbing;
+}
+
+.detachable-panel__float-body {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
 }
 
 /* ── Component Palette ── */

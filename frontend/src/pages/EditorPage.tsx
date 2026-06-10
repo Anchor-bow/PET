@@ -7,6 +7,7 @@ import {
   ComponentPalette,
   MediaLibrary,
   PropertyEditor,
+  DetachablePanel,
 } from '../components/builder';
 import { PageEditor } from '../components/builder/PageEditor';
 import { useAppStore } from '../store/useAppStore';
@@ -44,6 +45,8 @@ export function EditorPage() {
   const [showMedia, setShowMedia] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingDesktop, setIsExportingDesktop] = useState(false);
+  const [paletteDetached, setPaletteDetached] = useState(false);
+  const [sidebarDetached, setSidebarDetached] = useState(false);
   const handleExport = useCallback(async () => {
     if (!appId) return;
     setIsExporting(true);
@@ -376,8 +379,10 @@ export function EditorPage() {
         </div>
       ) : (
         <BuilderDndContext>
-          <div className="editor-workspace">
-            <ComponentPalette />
+          <div className={`editor-workspace${paletteDetached ? ' editor-workspace--no-left' : ''}${sidebarDetached ? ' editor-workspace--no-right' : ''}`}>
+            <DetachablePanel title="Komponenten" detached={paletteDetached} onDetachedChange={setPaletteDetached} defaultPosition={{ x: 20, y: 100 }}>
+              <ComponentPalette />
+            </DetachablePanel>
             <div className="editor-canvas" onClick={() => setSelectedNode(null)}>
               {currentPage ? (
                 <BuilderCanvas root={currentPage.root} />
@@ -385,13 +390,15 @@ export function EditorPage() {
                 <p className="empty">Keine Seite vorhanden.</p>
               )}
             </div>
-            {editingPage ? (
-              <PageEditor page={editingPage} onClose={() => setPageEditorPageId(null)} />
-            ) : showMedia ? (
-              <MediaLibrary />
-            ) : (
-              <PropertyEditor />
-            )}
+            <DetachablePanel title={editingPage ? 'Seite' : showMedia ? 'Mediathek' : 'Eigenschaften'} detached={sidebarDetached} onDetachedChange={setSidebarDetached} defaultPosition={{ x: 20, y: 400 }}>
+              {editingPage ? (
+                <PageEditor page={editingPage} onClose={() => setPageEditorPageId(null)} />
+              ) : showMedia ? (
+                <MediaLibrary />
+              ) : (
+                <PropertyEditor />
+              )}
+            </DetachablePanel>
           </div>
         </BuilderDndContext>
       )}

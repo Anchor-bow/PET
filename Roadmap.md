@@ -33,7 +33,7 @@ Linearer Plan für den No-Code App Builder. Reihenfolge ist verbindlich — Abh�
 | 25   | Android Build (Capacitor)        | ✅ erledigt         |
 | 26   | Lizenzsystem                     | ✅ erledigt         |
 | 27   | PET Design (Farben, Stil, Layout) | 🏗️ in Arbeit        |
-| 28   | UI Aufbau (Editor-Layout)        | ⏳ offen            |
+| 28   | UI Aufbau (Editor-Layout)        | 🏗️ in Arbeit        |
 | 29   | Seiten ID vereinfachen           | ⏳ offen            |
 | 30   | DB Builder UI                    | ⏳ offen            |
 | 31   | Device Preview                   | ⏳ offen            |
@@ -411,15 +411,15 @@ Ziel: Einheitliches, modernes Design für das gesamte PET-Programm.
 - **Fokus auf Lesbarkeit**: Ausreichende Schriftgrößen, Zeilenabstände, Kontraste
 - **Hinweis zu Building Blocks**: Die späteren Building Blocks (Phasen 34–42) erben diesen modernen Stil (abgerundete Ecken, Grid-Layout, einheitliches Spacing). Ihre spezifischen Farben (Akzente, Button-Farben, Hintergründe) werden jedoch später vom User im Editor pro App definiert – sie gehören zur App des Users, nicht zum PET-Programm.
 
-### 28 — UI Aufbau (Editor-Layout) ⏳
+### 28 — UI Aufbau (Editor-Layout) 🏗️
 
 Ziel: Editor-Layout grundlegend überarbeiten und an das neue Design anpassen.
 
-- Toolbar-Anordnung überarbeiten (konsistent, aufgeräumt)
-- Panel-Größen flexibel gestalten (resizable panels)
-- Responsives Verhalten des Editors
-- Dark Mode Support im Editor (Umschalter)
-- Alle bestehenden PET-Oberflächen (Dashboard, Editor, Licenses) auf das neue Design migrieren
+- **Collapsible Sidebar**: Seitenleiste einklappbar (220px ↔ 52px). Jeder Nav-Punkt erhält ein Icon. Im collapsed-Modus nur Icons sichtbar.
+- **Detachable Panels**: Komponenten-Palette und Property-Editor können vom Benutzer abgelöst werden. Im abgelösten Zustand schweben sie als frei positionierbare Fenster über dem Canvas → Canvas erhält volle Breite.
+- **Toolbar-Anordnung**: Toolbar-Buttons logisch gruppieren (Aktionen, Export, Ansicht).
+- **Responsives Verhalten**: Editor bei kleineren Fenstern nutzbar, Panels einklappbar.
+- **Dark Mode Support**: Theme-Umschalter in der Sidebar (bereits in Phase 27 implementiert).
 
 ### 29 — Seiten ID vereinfachen ⏳
 
